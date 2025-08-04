@@ -260,7 +260,7 @@ class ApiService {
   // Dashboard Methods
   async getDashboardData(lawFirmId?: string): Promise<DashboardData> {
     const params = lawFirmId ? { lawFirmId } : {};
-    const response: AxiosResponse<DashboardData> = await this.api.get('/dashboard', { params });
+    const response: AxiosResponse<DashboardData> = await this.api.get('/dashboard/summary', { params });
     return response.data;
   }
 
@@ -286,6 +286,31 @@ class ApiService {
       responseType: 'blob',
     });
     return response.data;
+  }
+
+  // Form Methods
+  async getFormTemplates(): Promise<any[]> {
+    const response: AxiosResponse<any[]> = await this.api.get('/forms/templates');
+    return response.data;
+  }
+
+  async getClientForms(): Promise<any[]> {
+    const response: AxiosResponse<any[]> = await this.api.get('/forms/client-forms');
+    return response.data;
+  }
+
+  async createFormTemplate(templateData: any): Promise<any> {
+    const response: AxiosResponse<any> = await this.api.post('/forms/templates', templateData);
+    return response.data;
+  }
+
+  async sendFormToClient(formData: any): Promise<any> {
+    const response: AxiosResponse<any> = await this.api.post('/forms/send-to-client', formData);
+    return response.data;
+  }
+
+  async sendFormReminder(formId: string): Promise<void> {
+    await this.api.post(`/forms/${formId}/send-reminder`);
   }
 }
 
