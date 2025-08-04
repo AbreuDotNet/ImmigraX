@@ -188,7 +188,6 @@ if (app.Environment.IsDevelopment())
     _ = Task.Run(async () =>
     {
         await Task.Delay(2000); // Wait 2 seconds
-        Console.WriteLine($"🚀 Abriendo Swagger UI: {swaggerUrl}");
         OpenBrowser(swaggerUrl);
     });
 }
