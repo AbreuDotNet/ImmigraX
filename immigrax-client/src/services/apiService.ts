@@ -260,7 +260,7 @@ class ApiService {
   // Dashboard Methods
   async getDashboardData(lawFirmId?: string): Promise<DashboardData> {
     const params = lawFirmId ? { lawFirmId } : {};
-    const response: AxiosResponse<DashboardData> = await this.api.get('/dashboard', { params });
+    const response: AxiosResponse<DashboardData> = await this.api.get('/dashboard/summary', { params });
     return response.data;
   }
 
