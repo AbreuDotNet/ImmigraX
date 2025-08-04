@@ -21,8 +21,8 @@ import {
   Warning,
 } from '@mui/icons-material';
 import { DashboardData } from '../types';
-import apiService from '../services/apiService';
 import ApiStatus from '../components/ApiStatus';
+import { useAuth } from '../context/AuthContext';
 
 // Mock data for development - replace with API call
 const mockData: DashboardData = {
@@ -78,15 +78,27 @@ const Dashboard: React.FC = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      // If user is not authenticated, use mock data immediately
+      if (!isAuthenticated) {
+        console.log('User not authenticated, using mock data');
+        setData(mockData);
+        setLoading(false);
+        return;
+      }
+
       try {
-        // Try to fetch real data from API
-        const response = await apiService.getDashboardData();
-        setData(response);
+        // For now, use mock data until we fix the SQL issue in dashboard endpoint
+        console.log('Using mock data due to dashboard endpoint SQL error');
+        setError(null);
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+        setData(mockData);
       } catch (err) {
         console.warn('API not available, using mock data:', err);
+        setError('API no disponible');
         // Fallback to mock data if API is not available
         await new Promise(resolve => setTimeout(resolve, 1000));
         setData(mockData);
@@ -96,7 +108,7 @@ const Dashboard: React.FC = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [isAuthenticated]);
 
   if (loading) {
     return (
