@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using LegalApp.API.Models;
+using LegalApp.API.Models.Forms;
 
 namespace LegalApp.API.Data
 {
@@ -24,6 +25,17 @@ namespace LegalApp.API.Data
         public DbSet<Message> Messages { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
 
+        // Form System DbSets
+        public DbSet<FormTemplate> FormTemplates { get; set; }
+        public DbSet<FormSection> FormSections { get; set; }
+        public DbSet<FormField> FormFields { get; set; }
+        public DbSet<ClientForm> ClientForms { get; set; }
+        public DbSet<FormResponse> FormResponses { get; set; }
+        public DbSet<FormRequiredDocument> FormRequiredDocuments { get; set; }
+        public DbSet<ClientFormDocument> ClientFormDocuments { get; set; }
+        public DbSet<FormNotification> FormNotifications { get; set; }
+        public DbSet<FormAuditLog> FormAuditLogs { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -42,6 +54,17 @@ namespace LegalApp.API.Data
             modelBuilder.Entity<ClientNote>().ToTable("client_notes");
             modelBuilder.Entity<Message>().ToTable("messages");
             modelBuilder.Entity<AuditLog>().ToTable("audit_logs");
+
+            // Form System table names
+            modelBuilder.Entity<FormTemplate>().ToTable("form_templates");
+            modelBuilder.Entity<FormSection>().ToTable("form_sections");
+            modelBuilder.Entity<FormField>().ToTable("form_fields");
+            modelBuilder.Entity<ClientForm>().ToTable("client_forms");
+            modelBuilder.Entity<FormResponse>().ToTable("form_responses");
+            modelBuilder.Entity<FormRequiredDocument>().ToTable("form_required_documents");
+            modelBuilder.Entity<ClientFormDocument>().ToTable("client_form_documents");
+            modelBuilder.Entity<FormNotification>().ToTable("form_notifications");
+            modelBuilder.Entity<FormAuditLog>().ToTable("form_audit_log");
 
             // Configure composite primary key for UserLawFirm
             modelBuilder.Entity<UserLawFirm>()
@@ -282,6 +305,136 @@ namespace LegalApp.API.Data
                 .Property(al => al.EntityType).HasColumnName("entity_type");
             modelBuilder.Entity<AuditLog>()
                 .Property(al => al.EntityId).HasColumnName("entity_id");
+
+            // ====================================
+            // FORM SYSTEM CONFIGURATIONS
+            // ====================================
+
+            // FormTemplate relationships
+            modelBuilder.Entity<FormTemplate>()
+                .HasOne(ft => ft.LawFirm)
+                .WithMany()
+                .HasForeignKey(ft => ft.LawFirmId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FormTemplate>()
+                .HasOne(ft => ft.Creator)
+                .WithMany()
+                .HasForeignKey(ft => ft.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // FormSection relationships
+            modelBuilder.Entity<FormSection>()
+                .HasOne(fs => fs.FormTemplate)
+                .WithMany(ft => ft.Sections)
+                .HasForeignKey(fs => fs.FormTemplateId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FormSection>()
+                .HasOne(fs => fs.DependsOnSection)
+                .WithMany()
+                .HasForeignKey(fs => fs.DependsOnSectionId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // FormField relationships
+            modelBuilder.Entity<FormField>()
+                .HasOne(ff => ff.Section)
+                .WithMany(fs => fs.Fields)
+                .HasForeignKey(ff => ff.SectionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ClientForm relationships
+            modelBuilder.Entity<ClientForm>()
+                .HasOne(cf => cf.Client)
+                .WithMany()
+                .HasForeignKey(cf => cf.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClientForm>()
+                .HasOne(cf => cf.FormTemplate)
+                .WithMany(ft => ft.ClientForms)
+                .HasForeignKey(cf => cf.FormTemplateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ClientForm>()
+                .HasOne(cf => cf.Reviewer)
+                .WithMany()
+                .HasForeignKey(cf => cf.ReviewedBy)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // FormResponse relationships
+            modelBuilder.Entity<FormResponse>()
+                .HasOne(fr => fr.ClientForm)
+                .WithMany(cf => cf.Responses)
+                .HasForeignKey(fr => fr.ClientFormId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FormResponse>()
+                .HasOne(fr => fr.Field)
+                .WithMany(ff => ff.Responses)
+                .HasForeignKey(fr => fr.FieldId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FormResponse>()
+                .HasOne(fr => fr.Verifier)
+                .WithMany()
+                .HasForeignKey(fr => fr.VerifiedBy)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // FormRequiredDocument relationships
+            modelBuilder.Entity<FormRequiredDocument>()
+                .HasOne(frd => frd.FormTemplate)
+                .WithMany(ft => ft.RequiredDocuments)
+                .HasForeignKey(frd => frd.FormTemplateId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ClientFormDocument relationships
+            modelBuilder.Entity<ClientFormDocument>()
+                .HasOne(cfd => cfd.ClientForm)
+                .WithMany(cf => cf.Documents)
+                .HasForeignKey(cfd => cfd.ClientFormId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClientFormDocument>()
+                .HasOne(cfd => cfd.RequiredDocument)
+                .WithMany(frd => frd.ClientDocuments)
+                .HasForeignKey(cfd => cfd.RequiredDocumentId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<ClientFormDocument>()
+                .HasOne(cfd => cfd.Verifier)
+                .WithMany()
+                .HasForeignKey(cfd => cfd.VerifiedBy)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // FormNotification relationships
+            modelBuilder.Entity<FormNotification>()
+                .HasOne(fn => fn.ClientForm)
+                .WithMany(cf => cf.Notifications)
+                .HasForeignKey(fn => fn.ClientFormId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // FormAuditLog relationships
+            modelBuilder.Entity<FormAuditLog>()
+                .HasOne(fal => fal.ClientForm)
+                .WithMany(cf => cf.AuditLogs)
+                .HasForeignKey(fal => fal.ClientFormId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FormAuditLog>()
+                .HasOne(fal => fal.User)
+                .WithMany()
+                .HasForeignKey(fal => fal.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Unique constraints
+            modelBuilder.Entity<ClientForm>()
+                .HasIndex(cf => cf.AccessToken)
+                .IsUnique();
+
+            modelBuilder.Entity<FormResponse>()
+                .HasIndex(fr => new { fr.ClientFormId, fr.FieldId })
+                .IsUnique();
         }
     }
 }

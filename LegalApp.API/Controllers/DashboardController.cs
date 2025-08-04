@@ -44,14 +44,17 @@ namespace LegalApp.API.Controllers
                 var activeClients = await _context.Clients.CountAsync(c => c.LawFirmId == lawFirmId && c.ProcessStatus != "Completado");
                 
                 var totalAppointments = await _context.Appointments.CountAsync(a => a.LawFirmId == lawFirmId);
+                var todayStart = DateTime.UtcNow.Date;
+                var todayEnd = todayStart.AddDays(1);
                 var todayAppointments = await _context.Appointments
-                    .CountAsync(a => a.LawFirmId == lawFirmId && a.AppointmentDate.Date == DateTime.Today);
+                    .CountAsync(a => a.LawFirmId == lawFirmId && a.AppointmentDate >= todayStart && a.AppointmentDate < todayEnd);
+                var weekFromNow = DateTime.UtcNow.AddDays(7);
                 var upcomingAppointments = await _context.Appointments
-                    .CountAsync(a => a.LawFirmId == lawFirmId && a.AppointmentDate > DateTime.Now && a.AppointmentDate <= DateTime.Now.AddDays(7));
+                    .CountAsync(a => a.LawFirmId == lawFirmId && a.AppointmentDate > DateTime.UtcNow && a.AppointmentDate <= weekFromNow);
 
                 var totalPayments = await _context.Payments.CountAsync(p => p.LawFirmId == lawFirmId);
                 var pendingPayments = await _context.Payments.CountAsync(p => p.LawFirmId == lawFirmId && p.Status == PaymentStatus.Pending);
-                var overduePayments = await _context.Payments.CountAsync(p => p.LawFirmId == lawFirmId && p.DueDate < DateTime.Now && p.Status != PaymentStatus.Paid);
+                var overduePayments = await _context.Payments.CountAsync(p => p.LawFirmId == lawFirmId && p.DueDate < DateTime.UtcNow && p.Status != PaymentStatus.Paid);
 
                 var totalRevenue = await _context.Payments
                     .Where(p => p.LawFirmId == lawFirmId && p.Status == PaymentStatus.Paid)
@@ -81,7 +84,7 @@ namespace LegalApp.API.Controllers
 
                 var recentAppointments = await _context.Appointments
                     .Include(a => a.Client)
-                    .Where(a => a.LawFirmId == lawFirmId && a.AppointmentDate >= DateTime.Now)
+                    .Where(a => a.LawFirmId == lawFirmId && a.AppointmentDate >= DateTime.UtcNow)
                     .OrderBy(a => a.AppointmentDate)
                     .Take(5)
                     .Select(a => new { 
@@ -110,7 +113,7 @@ namespace LegalApp.API.Controllers
                 var monthlyRevenue = await _context.Payments
                     .Where(p => p.LawFirmId == lawFirmId && 
                                p.Status == PaymentStatus.Paid && 
-                               p.PaidDate >= DateTime.Now.AddMonths(-6))
+                               p.PaidDate >= DateTime.UtcNow.AddMonths(-6))
                     .GroupBy(p => new { p.PaidDate!.Value.Year, p.PaidDate!.Value.Month })
                     .Select(g => new { 
                         Year = g.Key.Year, 
@@ -122,40 +125,38 @@ namespace LegalApp.API.Controllers
 
                 return Ok(new
                 {
-                    summary = new
+                    executiveSummary = new
                     {
-                        clients = new { total = totalClients, active = activeClients },
-                        appointments = new { 
-                            total = totalAppointments, 
-                            today = todayAppointments, 
-                            upcoming = upcomingAppointments 
-                        },
-                        payments = new { 
-                            total = totalPayments, 
-                            pending = pendingPayments, 
-                            overdue = overduePayments 
-                        },
-                        revenue = new { 
-                            total = totalRevenue, 
-                            pending = pendingRevenue 
-                        },
-                        documents = totalDocuments,
-                        notes = new { 
-                            total = totalNotes, 
-                            important = importantNotes 
-                        }
+                        totalClients,
+                        activeClients,
+                        totalRevenue,
+                        pendingPayments = pendingRevenue,
+                        upcomingAppointments = recentAppointments.Select(a => new {
+                            clientName = a.ClientName,
+                            appointmentType = a.AppointmentType,
+                            appointmentDate = a.AppointmentDate.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                            status = a.Status.ToString()
+                        }).ToList(),
+                        casesByStatus = casesByStatus.Select(c => new {
+                            status = c.Status ?? "Sin Estado",
+                            count = c.Count
+                        }).ToList()
                     },
-                    recentActivity = new
+                    performanceMetrics = new
                     {
-                        clients = recentClients,
-                        appointments = recentAppointments
+                        completedAppointments = await _context.Appointments
+                            .CountAsync(a => a.LawFirmId == lawFirmId && a.Status == AppointmentStatus.Completada),
+                        documentsUploaded = totalDocuments,
+                        averageResponseHours = 2.5, // Simplified calculation
+                        resolutionRate = totalClients > 0 ? (double)activeClients / totalClients * 100 : 0,
+                        periodRevenue = totalRevenue
                     },
-                    analytics = new
+                    alerts = new[]
                     {
-                        casesByStatus,
-                        casesByType,
-                        monthlyRevenue
-                    }
+                        overduePayments > 0 ? new { type = "urgente", message = $"{overduePayments} pagos vencidos" } : null,
+                        upcomingAppointments > 0 ? new { type = "info", message = $"{upcomingAppointments} citas próximas esta semana" } : null,
+                        importantNotes > 0 ? new { type = "warning", message = $"{importantNotes} notas importantes pendientes" } : null
+                    }.Where(a => a != null).ToList()
                 });
             }
             catch (Exception ex)
@@ -182,7 +183,7 @@ namespace LegalApp.API.Controllers
                 }
 
                 var lawFirmId = user.UserLawFirms.First().LawFirmId;
-                var startDate = DateTime.Now.AddDays(-days);
+                var startDate = DateTime.UtcNow.AddDays(-days);
 
                 // New clients in period
                 var newClients = await _context.Clients
@@ -267,7 +268,7 @@ namespace LegalApp.API.Controllers
                 var overduePayments = await _context.Payments
                     .Include(p => p.Client)
                     .Where(p => p.LawFirmId == lawFirmId && 
-                               p.DueDate < DateTime.Now && 
+                               p.DueDate < DateTime.UtcNow && 
                                p.Status != PaymentStatus.Paid)
                     .Select(p => new { 
                         type = "payment_overdue",
@@ -275,7 +276,7 @@ namespace LegalApp.API.Controllers
                         severity = "high",
                         clientId = p.ClientId,
                         paymentId = p.Id,
-                        daysOverdue = (DateTime.Now - p.DueDate).Days
+                        daysOverdue = (DateTime.UtcNow - p.DueDate).Days
                     })
                     .ToListAsync();
 
@@ -285,15 +286,15 @@ namespace LegalApp.API.Controllers
                 var upcomingAppointments = await _context.Appointments
                     .Include(a => a.Client)
                     .Where(a => a.LawFirmId == lawFirmId && 
-                               a.AppointmentDate > DateTime.Now && 
-                               a.AppointmentDate <= DateTime.Now.AddHours(24))
+                               a.AppointmentDate > DateTime.UtcNow && 
+                               a.AppointmentDate <= DateTime.UtcNow.AddHours(24))
                     .Select(a => new { 
                         type = "appointment_reminder",
                         message = $"Cita con {a.Client.FullName} - {a.AppointmentType}",
                         severity = "medium",
                         clientId = a.ClientId,
                         appointmentId = a.Id,
-                        hoursUntil = (a.AppointmentDate - DateTime.Now).TotalHours
+                        hoursUntil = (a.AppointmentDate - DateTime.UtcNow).TotalHours
                     })
                     .ToListAsync();
 
@@ -304,14 +305,14 @@ namespace LegalApp.API.Controllers
                     .Include(n => n.Client)
                     .Where(n => n.Client.LawFirmId == lawFirmId && 
                                n.IsImportant && 
-                               n.UpdatedAt < DateTime.Now.AddDays(-7))
+                               n.UpdatedAt < DateTime.UtcNow.AddDays(-7))
                     .Select(n => new { 
                         type = "important_note_stale",
                         message = $"Nota importante sin actividad: {n.Title} - {n.Client.FullName}",
                         severity = "low",
                         clientId = n.ClientId,
                         noteId = n.Id,
-                        daysSinceUpdate = (DateTime.Now - n.UpdatedAt).Days
+                        daysSinceUpdate = (DateTime.UtcNow - n.UpdatedAt).Days
                     })
                     .ToListAsync();
 

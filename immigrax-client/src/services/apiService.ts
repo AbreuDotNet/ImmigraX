@@ -287,6 +287,31 @@ class ApiService {
     });
     return response.data;
   }
+
+  // Form Methods
+  async getFormTemplates(): Promise<any[]> {
+    const response: AxiosResponse<any[]> = await this.api.get('/forms/templates');
+    return response.data;
+  }
+
+  async getClientForms(): Promise<any[]> {
+    const response: AxiosResponse<any[]> = await this.api.get('/forms/client-forms');
+    return response.data;
+  }
+
+  async createFormTemplate(templateData: any): Promise<any> {
+    const response: AxiosResponse<any> = await this.api.post('/forms/templates', templateData);
+    return response.data;
+  }
+
+  async sendFormToClient(formData: any): Promise<any> {
+    const response: AxiosResponse<any> = await this.api.post('/forms/send-to-client', formData);
+    return response.data;
+  }
+
+  async sendFormReminder(formId: string): Promise<void> {
+    await this.api.post(`/forms/${formId}/send-reminder`);
+  }
 }
 
 // Create and export a singleton instance
