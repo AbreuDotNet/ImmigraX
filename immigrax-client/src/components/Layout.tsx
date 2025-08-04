@@ -5,7 +5,7 @@ import { Box,  Drawer,  AppBar,  Toolbar,  List,  Typography,  Divider,
         Avatar,  Menu,  MenuItem,  Chip, } from '@mui/material';
 import {
   Menu as MenuIcon,  Dashboard,  People,  Event,  Description,  Payment,
-  Note,  Search,  Logout,  AccountCircle,  Settings, } from '@mui/icons-material';
+  Note,  Search,  Logout,  AccountCircle,  Settings,  Gavel,  FlightTakeoff, } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
 const drawerWidth = 240;
@@ -74,7 +74,24 @@ const Layout: React.FC = () => {
   const drawer = (
     <div>
       <Toolbar>
-        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            width: '100%',
+            cursor: 'pointer',
+            '&:hover': {
+              backgroundColor: 'rgba(25, 118, 210, 0.08)',
+            },
+            borderRadius: 1,
+            p: 0.5
+          }}
+          onClick={() => handleNavigation('/dashboard')}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
+            <Gavel sx={{ color: 'primary.main', mr: 0.5, fontSize: 20 }} />
+            <FlightTakeoff sx={{ color: 'primary.main', fontSize: 18 }} />
+          </Box>
           <Typography variant="h6" noWrap component="div" color="primary" fontWeight="bold">
             ImmigraX
           </Typography>
@@ -118,7 +135,27 @@ const Layout: React.FC = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Box 
+            sx={{ 
+              display: { xs: 'flex', sm: 'none' },
+              alignItems: 'center',
+              cursor: 'pointer',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              },
+              borderRadius: 1,
+              p: 0.5,
+              mr: 2
+            }}
+            onClick={() => handleNavigation('/dashboard')}
+          >
+            <Gavel sx={{ color: 'white', mr: 0.5, fontSize: 20 }} />
+            <FlightTakeoff sx={{ color: 'white', fontSize: 18, mr: 1 }} />
+            <Typography variant="h6" noWrap component="div" color="white" fontWeight="bold">
+              ImmigraX
+            </Typography>
+          </Box>
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
             Sistema de Gestión Legal
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
