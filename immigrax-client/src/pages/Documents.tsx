@@ -16,9 +16,16 @@ import {
   Chip,
   IconButton,
   Alert,
-  Card,
-  CardContent,
-  CardActions,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemSecondaryAction,
+  Badge,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -30,6 +37,8 @@ import {
   PictureAsPdf as PdfIcon,
   Image as ImageIcon,
   InsertDriveFile as FileIcon,
+  ExpandMore as ExpandMoreIcon,
+  Person as PersonIcon,
 } from '@mui/icons-material';
 import apiService from '../services/apiService';
 
@@ -75,8 +84,8 @@ const Documents: React.FC = () => {
   const [clients, setClients] = useState<Array<{id: string, fullName: string}>>([]);
 
   useEffect(() => {
-    loadDocuments();
     loadClients();
+    loadDocuments();
   }, []);
 
   const loadDocuments = async () => {
@@ -98,27 +107,72 @@ const Documents: React.FC = () => {
         },
         {
           id: '2',
-          clientId: '2',
-          clientName: 'Juan Rodríguez',
-          fileName: 'birth_certificate_juan.jpg',
-          originalFileName: 'Acta Nacimiento Juan.jpg',
-          fileType: 'image/jpeg',
-          fileSize: 1536000,
+          clientId: '1',
+          clientName: 'María García',
+          fileName: 'birth_certificate_maria.pdf',
+          originalFileName: 'Acta Nacimiento María García.pdf',
+          fileType: 'application/pdf',
+          fileSize: 1200000,
           documentType: 'Acta de Nacimiento',
-          uploadedAt: '2025-01-10T14:20:00Z',
+          uploadedAt: '2025-01-12T09:00:00Z',
           description: 'Acta de nacimiento apostillada'
         },
         {
           id: '3',
+          clientId: '1',
+          clientName: 'María García',
+          fileName: 'medical_maria.jpg',
+          originalFileName: 'Certificado Médico María.jpg',
+          fileType: 'image/jpeg',
+          fileSize: 850000,
+          documentType: 'Certificado Médico',
+          uploadedAt: '2025-01-10T14:20:00Z'
+        },
+        {
+          id: '4',
+          clientId: '2',
+          clientName: 'Juan Rodríguez',
+          fileName: 'passport_juan.pdf',
+          originalFileName: 'Pasaporte Juan Rodríguez.pdf',
+          fileType: 'application/pdf',
+          fileSize: 1800000,
+          documentType: 'Pasaporte',
+          uploadedAt: '2025-01-14T11:15:00Z',
+          description: 'Pasaporte renovado recientemente'
+        },
+        {
+          id: '5',
+          clientId: '2',
+          clientName: 'Juan Rodríguez',
+          fileName: 'visa_juan.jpg',
+          originalFileName: 'Visa Actual Juan.jpg',
+          fileType: 'image/jpeg',
+          fileSize: 950000,
+          documentType: 'Visa',
+          uploadedAt: '2025-01-13T16:45:00Z'
+        },
+        {
+          id: '6',
           clientId: '3',
           clientName: 'Ana López',
-          fileName: 'medical_certificate_ana.pdf',
-          originalFileName: 'Certificado Médico Ana López.pdf',
+          fileName: 'diploma_ana.pdf',
+          originalFileName: 'Diploma Universitario Ana López.pdf',
           fileType: 'application/pdf',
-          fileSize: 896000,
-          documentType: 'Certificado Médico',
+          fileSize: 1500000,
+          documentType: 'Diploma',
           uploadedAt: '2025-01-08T09:15:00Z',
-          description: 'Examen médico para inmigración'
+          description: 'Título universitario apostillado'
+        },
+        {
+          id: '7',
+          clientId: '3',
+          clientName: 'Ana López',
+          fileName: 'marriage_certificate_ana.pdf',
+          originalFileName: 'Acta Matrimonio Ana López.pdf',
+          fileType: 'application/pdf',
+          fileSize: 1100000,
+          documentType: 'Acta de Matrimonio',
+          uploadedAt: '2025-01-05T13:30:00Z'
         }
       ];
       
@@ -134,15 +188,24 @@ const Documents: React.FC = () => {
   const loadClients = async () => {
     try {
       const response = await apiService.getClients();
-      setClients(response || []);
+      if (response && response.length > 0) {
+        setClients(response);
+      } else {
+        // Usar datos mock si no hay respuesta o está vacía
+        setClients([
+          { id: '1', fullName: 'María García' },
+          { id: '2', fullName: 'Juan Rodríguez' },
+          { id: '3', fullName: 'Ana López' },
+        ]);
+      }
     } catch (error) {
+      console.warn('API no disponible, usando datos mock para clientes');
       // Datos mock si la API no está disponible
-      const mockClients = [
+      setClients([
         { id: '1', fullName: 'María García' },
         { id: '2', fullName: 'Juan Rodríguez' },
         { id: '3', fullName: 'Ana López' },
-      ];
-      setClients(mockClients);
+      ]);
     }
   };
 
@@ -199,6 +262,36 @@ const Documents: React.FC = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  // Agrupar documentos por cliente
+  const groupDocumentsByClient = () => {
+    const grouped: {[key: string]: Document[]} = {};
+    
+    documents.forEach(doc => {
+      if (!grouped[doc.clientId]) {
+        grouped[doc.clientId] = [];
+      }
+      grouped[doc.clientId].push(doc);
+    });
+    
+    return grouped;
+  };
+
+  const getClientName = (clientId: string) => {
+    // Primero intentar encontrar el cliente en la lista de clientes
+    const client = clients.find(c => c.id === clientId);
+    if (client) {
+      return client.fullName;
+    }
+    
+    // Si no se encuentra, buscar en los documentos por el clientName
+    const document = documents.find(d => d.clientId === clientId);
+    if (document && document.clientName) {
+      return document.clientName;
+    }
+    
+    return 'Cliente Desconocido';
+  };
+
   const getDocumentTypeColor = (type: string) => {
     const colors: {[key: string]: "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"} = {
       'Pasaporte': 'primary',
@@ -241,61 +334,114 @@ const Documents: React.FC = () => {
         </Alert>
       )}
 
-      <Box 
-        sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', 
-          gap: 3 
-        }}
-      >
-        {documents.map((document) => (
-          <Card key={document.id}>
-            <CardContent>
-              <Box display="flex" alignItems="center" mb={2}>
-                {getFileIcon(document.fileType)}
-                <Typography variant="h6" sx={{ ml: 1, flexGrow: 1 }}>
-                  {document.originalFileName}
+      <Box sx={{ mt: 3 }}>
+        {Object.entries(groupDocumentsByClient()).map(([clientId, clientDocuments]) => (
+          <Accordion key={clientId} sx={{ mb: 2 }}>
+            <AccordionSummary 
+              expandIcon={<ExpandMoreIcon />}
+              sx={{ 
+                backgroundColor: 'primary.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'primary.dark',
+                },
+                '& .MuiAccordionSummary-expandIconWrapper': {
+                  color: 'white',
+                },
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                <PersonIcon sx={{ mr: 2 }} />
+                <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                  {getClientName(clientId)}
                 </Typography>
+                <Badge 
+                  badgeContent={clientDocuments.length} 
+                  color="secondary"
+                  sx={{ mr: 2 }}
+                >
+                  <DocumentIcon />
+                </Badge>
               </Box>
-              
-              <Typography color="text.secondary" gutterBottom>
-                Cliente: {document.clientName}
-              </Typography>
-              
-              <Chip 
-                label={document.documentType}
-                color={getDocumentTypeColor(document.documentType)}
-                size="small"
-                sx={{ mb: 1 }}
-              />
-              
-              <Typography variant="body2" color="text.secondary">
-                Tamaño: {formatFileSize(document.fileSize)}
-              </Typography>
-              
-              <Typography variant="body2" color="text.secondary">
-                Subido: {new Date(document.uploadedAt).toLocaleDateString()}
-              </Typography>
-              
-              {document.description && (
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  {document.description}
-                </Typography>
-              )}
-            </CardContent>
+            </AccordionSummary>
             
-            <CardActions>
-              <IconButton size="small" color="primary">
-                <ViewIcon />
-              </IconButton>
-              <IconButton size="small" color="success">
-                <DownloadIcon />
-              </IconButton>
-              <IconButton size="small" color="error">
-                <DeleteIcon />
-              </IconButton>
-            </CardActions>
-          </Card>
+            <AccordionDetails sx={{ p: 0 }}>
+              <List sx={{ width: '100%' }}>
+                {clientDocuments.map((document, index) => (
+                  <React.Fragment key={document.id}>
+                    <ListItem
+                      sx={{
+                        py: 2,
+                        '&:hover': {
+                          backgroundColor: 'action.hover',
+                        },
+                      }}
+                    >
+                      <ListItemIcon>
+                        {getFileIcon(document.fileType)}
+                      </ListItemIcon>
+                      
+                      <ListItemText
+                        primary={
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="subtitle1" fontWeight="medium">
+                              {document.originalFileName}
+                            </Typography>
+                            <Chip 
+                              label={document.documentType}
+                              color={getDocumentTypeColor(document.documentType)}
+                              size="small"
+                            />
+                          </Box>
+                        }
+                        secondary={
+                          <Box sx={{ mt: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              Tamaño: {formatFileSize(document.fileSize)} • 
+                              Subido: {new Date(document.uploadedAt).toLocaleDateString('es-ES')}
+                            </Typography>
+                            {document.description && (
+                              <Typography variant="body2" sx={{ mt: 0.5, fontStyle: 'italic' }}>
+                                {document.description}
+                              </Typography>
+                            )}
+                          </Box>
+                        }
+                      />
+                      
+                      <ListItemSecondaryAction>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <IconButton 
+                            size="small" 
+                            color="primary"
+                            title="Visualizar documento"
+                          >
+                            <ViewIcon />
+                          </IconButton>
+                          <IconButton 
+                            size="small" 
+                            color="success"
+                            title="Descargar documento"
+                          >
+                            <DownloadIcon />
+                          </IconButton>
+                          <IconButton 
+                            size="small" 
+                            color="error"
+                            title="Eliminar documento"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                    
+                    {index < clientDocuments.length - 1 && <Divider />}
+                  </React.Fragment>
+                ))}
+              </List>
+            </AccordionDetails>
+          </Accordion>
         ))}
       </Box>
 
