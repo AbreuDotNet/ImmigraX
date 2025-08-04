@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using LegalApp.API.Data;
 using LegalApp.API.Services;
 using LegalApp.API.Seeders;
@@ -119,6 +121,7 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "LegalApp API V1");
         c.RoutePrefix = "swagger";
+        c.DocumentTitle = "LegalApp API - Swagger UI";
     });
 }
 
@@ -148,6 +151,46 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<LegalAppDbContext>();
     await DatabaseSeeder.SeedAsync(context);
+}
+
+// Function to open browser
+static void OpenBrowser(string url)
+{
+    try
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            Process.Start("xdg-open", url);
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Process.Start("open", url);
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"No se pudo abrir el navegador automáticamente: {ex.Message}");
+        Console.WriteLine($"Abre manualmente: {url}");
+    }
+}
+
+// Open Swagger UI automatically in development
+if (app.Environment.IsDevelopment())
+{
+    var urls = app.Configuration.GetValue<string>("urls") ?? "http://localhost:5109";
+    var swaggerUrl = $"{urls.Split(';')[0]}/swagger/index.html";
+    
+    // Delay to ensure the server is fully started
+    _ = Task.Run(async () =>
+    {
+        await Task.Delay(2000); // Wait 2 seconds
+        Console.WriteLine($"🚀 Abriendo Swagger UI: {swaggerUrl}");
+        OpenBrowser(swaggerUrl);
+    });
 }
 
 app.Run();

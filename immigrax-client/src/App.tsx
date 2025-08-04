@@ -13,6 +13,7 @@ import Documents from './pages/Documents';
 import Payments from './pages/Payments';
 import Notes from './pages/Notes';
 import SearchPage from './pages/SearchPage';
+import FormsManagement from './pages/FormsManagement';
 
 // Create a theme instance
 const theme = createTheme({
@@ -47,6 +48,7 @@ function App() {
                 <Route path="payments" element={<Payments />} />
                 <Route path="notes" element={<Notes />} />
                 <Route path="search" element={<SearchPage />} />
+                <Route path="forms" element={<FormsManagement />} />
               </Route>
             </Routes>
           </Router>

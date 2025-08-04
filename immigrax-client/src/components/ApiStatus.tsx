@@ -10,7 +10,7 @@ import {
   Error,
   Warning,
 } from '@mui/icons-material';
-import apiService from '../services/apiService';
+import { useAuth } from '../context/AuthContext';
 
 interface ApiStatusProps {
   showDetails?: boolean;
@@ -19,13 +19,33 @@ interface ApiStatusProps {
 const ApiStatus: React.FC<ApiStatusProps> = ({ showDetails = false }) => {
   const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected' | 'error'>('checking');
   const [lastCheck, setLastCheck] = useState<Date | null>(null);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const checkApiStatus = async () => {
+      // Only check API status if user is authenticated
+      if (!isAuthenticated) {
+        setStatus('disconnected');
+        setLastCheck(new Date());
+        return;
+      }
+
       try {
-        // Try to fetch dashboard data as a health check
-        await apiService.getDashboardData();
-        setStatus('connected');
+        // Try a simple health check - just verify the API responds
+        const response = await fetch('http://localhost:5109/api/clients', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok || response.status === 401) {
+          // 200 OK or 401 Unauthorized both mean API is responding
+          setStatus('connected');
+        } else {
+          setStatus('disconnected');
+        }
       } catch (error) {
         console.warn('API Health Check Failed:', error);
         setStatus('disconnected');
@@ -36,11 +56,15 @@ const ApiStatus: React.FC<ApiStatusProps> = ({ showDetails = false }) => {
 
     checkApiStatus();
     
-    // Check API status every 30 seconds
-    const interval = setInterval(checkApiStatus, 30000);
+    // Check API status every 30 seconds, but only if authenticated
+    const interval = setInterval(() => {
+      if (isAuthenticated) {
+        checkApiStatus();
+      }
+    }, 30000);
     
     return () => clearInterval(interval);
-  }, []);
+  }, [isAuthenticated]);
 
   const getStatusInfo = () => {
     switch (status) {
@@ -96,7 +120,8 @@ const ApiStatus: React.FC<ApiStatusProps> = ({ showDetails = false }) => {
           <Box>
             <Typography variant="body2">
               {status === 'connected' && 'Conectado a la API de .NET. Los datos se cargan en tiempo real.'}
-              {status === 'disconnected' && 'La API no está disponible. Mostrando datos de ejemplo para desarrollo.'}
+              {status === 'disconnected' && !isAuthenticated && 'Necesitas iniciar sesión para conectar con la API.'}
+              {status === 'disconnected' && isAuthenticated && 'La API no está disponible. Mostrando datos de ejemplo para desarrollo.'}
               {status === 'checking' && 'Verificando conexión con la API...'}
               {status === 'error' && 'Error al conectar con la API. Verifica que el servidor esté ejecutándose.'}
             </Typography>

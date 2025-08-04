@@ -23,6 +23,7 @@ import {
 import { DashboardData } from '../types';
 import apiService from '../services/apiService';
 import ApiStatus from '../components/ApiStatus';
+import { useAuth } from '../context/AuthContext';
 
 // Mock data for development - replace with API call
 const mockData: DashboardData = {
@@ -78,17 +79,32 @@ const Dashboard: React.FC = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      // If user is not authenticated, use mock data immediately
+      if (!isAuthenticated) {
+        console.log('User not authenticated, using mock data');
+        setData(mockData);
+        setLoading(false);
+        return;
+      }
+
       try {
-        // Try to fetch real data from API
+        setLoading(true);
+        setError(null);
+        console.log('Attempting to fetch dashboard data from API...');
+        
+        // Try to fetch real dashboard data
         const response = await apiService.getDashboardData();
+        console.log('Dashboard data fetched successfully:', response);
         setData(response);
       } catch (err) {
-        console.warn('API not available, using mock data:', err);
-        // Fallback to mock data if API is not available
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.warn('Dashboard API failed, using mock data:', err);
+        setError('Dashboard API temporalmente no disponible');
+        // Fallback to mock data if API fails
+        await new Promise(resolve => setTimeout(resolve, 500));
         setData(mockData);
       } finally {
         setLoading(false);
@@ -96,7 +112,7 @@ const Dashboard: React.FC = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [isAuthenticated]);
 
   if (loading) {
     return (
