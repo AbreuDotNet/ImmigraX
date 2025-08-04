@@ -5,7 +5,7 @@ import { Box,  Drawer,  AppBar,  Toolbar,  List,  Typography,  Divider,
         Avatar,  Menu,  MenuItem,  Chip, } from '@mui/material';
 import {
   Menu as MenuIcon,  Dashboard,  People,  Event,  Description,  Payment,
-  Note,  Search,  Logout,  AccountCircle,  Settings,  Gavel,  FlightTakeoff, } from '@mui/icons-material';
+  Note,  Search,  Logout,  AccountCircle,  Settings,  Gavel,  FlightTakeoff,  Assignment, } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
 const drawerWidth = 240;
@@ -24,6 +24,7 @@ const menuItems: MenuItemType[] = [
   { text: 'Documentos', icon: <Description />, path: '/documents' },
   { text: 'Pagos', icon: <Payment />, path: '/payments' },
   { text: 'Notas', icon: <Note />, path: '/notes' },
+  { text: 'Formularios', icon: <Assignment />, path: '/forms' },
   { text: 'Búsqueda', icon: <Search />, path: '/search' },
 ];
 
