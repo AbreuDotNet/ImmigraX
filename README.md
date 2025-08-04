@@ -1,237 +1,434 @@
-# ImmigraX - Sistema de Gestión Legal para Inmigración
+<div align="center">
+  <h1>🏛️ ImmigraX</h1>
+  <p><strong>Professional Immigration Legal Management System</strong></p>
+  
+  <p>
+    <a href="#features">Features</a> •
+    <a href="#quick-start">Quick Start</a> •
+    <a href="#documentation">Documentation</a> •
+    <a href="#contributing">Contributing</a>
+  </p>
 
-## Descripción
+  ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet)
+  ![React](https://img.shields.io/badge/React-19.1.1-61DAFB?style=for-the-badge&logo=react)
+  ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)
+  ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=for-the-badge&logo=postgresql)
+  ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-ImmigraX es un sistema completo de gestión legal especializado en servicios de inmigración. Incluye un backend .NET y un frontend React con TypeScript para proporcionar una solución integral para bufetes de abogados y profesionales del derecho de inmigración.
-
-## Características Principales
-
-### Backend (.NET 8)
-- **API RESTful** con autenticación JWT
-- **Base de datos PostgreSQL** con Entity Framework Core
-- **Roles de usuario**: Master, Abogado, Secretario
-- **Gestión completa de clientes**
-- **Sistema de citas y documentos**
-- **Notas y seguimiento de casos**
-- **Búsqueda avanzada**
-- **Reportes y analytics**
-- **Rate limiting y middleware de seguridad**
-- **Swagger/OpenAPI documentation**
-
-### Frontend (React + TypeScript)
-- **Material-UI** para una interfaz moderna y profesional
-- **React Router v6** para navegación
-- **TanStack React Query** para gestión de estado del servidor
-- **Axios** con interceptors para manejo de API
-- **Dashboard ejecutivo** con métricas en tiempo real
-- **Gestión de clientes, citas y documentos**
-- **Sistema de autenticación integrado**
-- **Diseño responsive**
-- **Modo offline** con datos mock como fallback
-
-## Tecnologías Utilizadas
-
-### Backend
-- .NET 8
-- ASP.NET Core Web API
-- Entity Framework Core
-- PostgreSQL
-- JWT Authentication
-- Swagger/OpenAPI
-- AspNetCoreRateLimit
-
-### Frontend
-- React 19.1.1
-- TypeScript
-- Material-UI (MUI)
-- React Router v6
-- TanStack React Query
-- Axios
-- Vite (build tool)
-
-## Estructura del Proyecto
-
-```
-ImmigraX/
-├── LegalApp.API/                 # Backend .NET
-│   ├── Controllers/              # Controladores API
-│   ├── Models/                   # Modelos de datos
-│   ├── Services/                 # Lógica de negocio
-│   ├── Data/                     # Contexto de base de datos
-│   ├── DTOs/                     # Data Transfer Objects
-│   ├── Middleware/               # Middleware personalizado
-│   └── Seeders/                  # Datos de prueba
-├── immigrax-client/              # Frontend React
-│   ├── src/
-│   │   ├── components/           # Componentes reutilizables
-│   │   ├── pages/                # Páginas de la aplicación
-│   │   ├── services/             # Servicios API
-│   │   ├── context/              # React Context
-│   │   ├── types/                # Tipos TypeScript
-│   │   └── config/               # Configuración
-│   └── public/                   # Archivos estáticos
-└── start-app.ps1                 # Script de inicio automático
-```
-
-## Instalación y Configuración
-
-### Prerrequisitos
-- .NET 8 SDK
-- Node.js (v18+)
-- PostgreSQL
-- Git
-
-### 1. Clonar el repositorio
-```bash
-git clone https://github.com/AbreuDotNet/ImmigraX.git
-cd ImmigraX
-```
-
-### 2. Configurar el Backend
-
-1. Navegar al directorio del API:
-```bash
-cd LegalApp.API
-```
-
-2. Configurar la cadena de conexión en `appsettings.json`:
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Database=immigrax_db;Username=tu_usuario;Password=tu_password"
-  }
-}
-```
-
-3. Ejecutar migraciones:
-```bash
-dotnet ef database update
-```
-
-4. Ejecutar el backend:
-```bash
-dotnet run
-```
-
-El API estará disponible en `http://localhost:5109`
-
-### 3. Configurar el Frontend
-
-1. Navegar al directorio del cliente:
-```bash
-cd immigrax-client
-```
-
-2. Instalar dependencias:
-```bash
-npm install
-```
-
-3. Crear archivo `.env` (opcional):
-```
-REACT_APP_API_URL=http://localhost:5109/api
-```
-
-4. Ejecutar el frontend:
-```bash
-npm start
-```
-
-El cliente estará disponible en `http://localhost:3000`
-
-### 4. Inicio Automático (Windows)
-
-Para iniciar ambos servicios automáticamente, ejecuta el script PowerShell incluido:
-
-```powershell
-.\start-app.ps1
-```
-
-## Credenciales de Prueba
-
-El sistema incluye datos de prueba preconfigurados:
-
-### Usuario Master
-- **Email**: `dabreu@synerxrd.com`
-- **Contraseña**: `Master123!`
-- **Rol**: Master (acceso completo)
-
-### Usuario Abogado
-- **Email**: `maria.gonzalez@immigrax.com`
-- **Contraseña**: `Abogado123!`
-- **Rol**: Abogado
-
-### Usuario Secretario
-- **Email**: `ana@immigrax.com`
-- **Contraseña**: `Secretario123!`
-- **Rol**: Secretario
-
-## Funcionalidades
-
-### Dashboard
-- Métricas ejecutivas en tiempo real
-- Gráficos de casos por estado
-- Alertas y notificaciones
-- Resumen de actividad reciente
-
-### Gestión de Clientes
-- CRUD completo de clientes
-- Búsqueda y filtrado avanzado
-- Historial de casos
-- Documentos asociados
-
-### Sistema de Citas
-- Calendario integrado
-- Gestión de estados de citas
-- Notificaciones automáticas
-- Sincronización con casos
-
-### Documentos
-- Subida y gestión de archivos
-- Categorización por tipo
-- Control de versiones
-- Acceso basado en roles
-
-### Reportes
-- Reportes ejecutivos
-- Analytics de casos
-- Exportación de datos
-- Gráficos interactivos
-
-## API Documentation
-
-Una vez que el backend esté ejecutándose, puedes acceder a la documentación interactiva de Swagger en:
-
-`http://localhost:5109/swagger`
-
-## Contribución
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-## Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
-
-## Soporte
-
-Para soporte y preguntas, contacta a:
-- **Email**: dabreu@synerxrd.com
-- **GitHub**: [@AbreuDotNet](https://github.com/AbreuDotNet)
-
-## Roadmap
-
-- [ ] Módulo de facturación
-- [ ] Integración con calendarios externos
-- [ ] Notificaciones push
-- [ ] API móvil
-- [ ] Integración con servicios de gobierno
-- [ ] Análisis predictivo con IA
-- [ ] Soporte multiidioma
+</div>
 
 ---
 
-**ImmigraX** - Transformando la gestión legal de inmigración con tecnología moderna.
+## 🚀 Overview
+
+**ImmigraX** is a comprehensive legal management system specifically designed for immigration law practices. Built with modern technologies, it provides an end-to-end solution for law firms, attorneys, and immigration professionals to streamline their workflow and enhance client service delivery.
+
+### 🎯 Key Highlights
+
+- **🏢 Multi-tenant Architecture**: Support for multiple law firms with complete data isolation
+- **📋 DS-160 Form Management**: Complete implementation of US immigration form DS-160 with dynamic field generation
+- **⚡ Real-time Dashboard**: Executive metrics and analytics with live updates
+- **🔐 Enterprise Security**: JWT authentication, role-based access control, and rate limiting
+- **📱 Responsive Design**: Modern UI that works seamlessly across all devices
+- **🌐 API-First**: RESTful API with comprehensive OpenAPI/Swagger documentation
+
+## ✨ Features
+
+### 🖥️ Backend (.NET 8)
+- **RESTful API** with JWT authentication and authorization
+- **PostgreSQL database** with Entity Framework Core ORM
+- **Role-based access control**: Master, Lawyer, Secretary roles
+- **Comprehensive client management** with case tracking
+- **Appointment scheduling system** with calendar integration
+- **Document management** with secure file uploads
+- **Advanced search capabilities** across all entities
+- **Executive reports and analytics** with data visualization
+- **Rate limiting and security middleware** for API protection
+- **Complete OpenAPI/Swagger documentation**
+
+### ⚛️ Frontend (React + TypeScript)
+- **Material-UI (MUI)** for professional, accessible interface
+- **React Router v6** for client-side routing
+- **TanStack React Query** for efficient server state management
+- **Axios HTTP client** with request/response interceptors
+- **Executive dashboard** with real-time metrics and charts
+- **CRUD operations** for clients, appointments, and documents
+- **Integrated authentication** with persistent sessions
+- **Fully responsive design** optimized for all screen sizes
+- **Offline-ready** with mock data fallback capabilities
+
+## 🛠️ Technology Stack
+
+<table>
+<tr>
+<td valign="top" width="50%">
+
+### Backend
+- **.NET 8** - Modern web framework
+- **ASP.NET Core** - Cross-platform web API
+- **Entity Framework Core** - Object-relational mapper
+- **PostgreSQL** - Advanced open-source database
+- **JWT Bearer Authentication** - Secure token-based auth
+- **Swagger/OpenAPI** - API documentation
+- **AspNetCoreRateLimit** - Request rate limiting
+
+</td>
+<td valign="top" width="50%">
+
+### Frontend
+- **React 19.1.1** - Modern UI library
+- **TypeScript** - Type-safe JavaScript
+- **Material-UI v5** - React component library
+- **React Router v6** - Declarative routing
+- **TanStack React Query** - Data fetching/caching
+- **Axios** - HTTP client library
+- **Vite** - Next-generation build tool
+
+</td>
+</tr>
+</table>
+
+## 📁 Project Structure
+
+```
+ImmigraX/
+├── 📁 LegalApp.API/                    # .NET 8 Backend
+│   ├── 📁 Controllers/                 # API Controllers
+│   │   ├── 📁 Forms/                   # Form management endpoints
+│   │   ├── AuthController.cs           # Authentication endpoints
+│   │   ├── ClientsController.cs        # Client management
+│   │   ├── AppointmentsController.cs   # Appointment scheduling
+│   │   └── DashboardController.cs      # Analytics & metrics
+│   ├── 📁 Models/                      # Entity Models
+│   │   ├── 📁 Forms/                   # Form system entities
+│   │   ├── Client.cs                   # Client entity
+│   │   ├── User.cs                     # User entity
+│   │   └── LawFirm.cs                  # Law firm entity
+│   ├── 📁 Services/                    # Business Logic Services
+│   │   ├── AuthService.cs              # Authentication logic
+│   │   ├── EmailService.cs             # Email notifications
+│   │   └── ReportService.cs            # Report generation
+│   ├── 📁 Data/                        # Database Context
+│   │   └── LegalAppDbContext.cs        # EF Core context
+│   ├── 📁 DTOs/                        # Data Transfer Objects
+│   │   └── 📁 Forms/                   # Form-related DTOs
+│   ├── 📁 Middleware/                  # Custom Middleware
+│   │   └── LawFirmPermissionMiddleware.cs
+│   ├── 📁 Migrations/                  # Database Migrations
+│   └── 📁 Seeders/                     # Sample Data
+├── 📁 immigrax-client/                 # React Frontend
+│   ├── 📁 src/
+│   │   ├── 📁 components/              # Reusable UI Components
+│   │   │   ├── Layout.tsx              # Main application layout
+│   │   │   ├── Dashboard/              # Dashboard components
+│   │   │   └── Common/                 # Shared components
+│   │   ├── 📁 pages/                   # Application Pages
+│   │   │   ├── Login.tsx               # Authentication page
+│   │   │   ├── Dashboard.tsx           # Executive dashboard
+│   │   │   ├── ClientManagement.tsx    # Client CRUD
+│   │   │   └── FormsManagement.tsx     # Form management
+│   │   ├── 📁 services/                # API Services
+│   │   │   └── apiService.ts           # HTTP client & API calls
+│   │   ├── 📁 context/                 # React Context
+│   │   │   └── AuthContext.tsx         # Authentication state
+│   │   ├── 📁 types/                   # TypeScript Definitions
+│   │   │   └── index.ts                # Type definitions
+│   │   └── 📁 config/                  # Configuration
+│   │       └── index.ts                # App configuration
+│   └── 📁 public/                      # Static Assets
+├── 📄 start-app.ps1                    # Development startup script
+├── 📄 database-extensions.sql          # PostgreSQL extensions
+├── 📄 ds160-sample-data.sql           # Sample DS-160 form data
+└── 📄 README.md                        # This file
+```
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- **[.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)** (8.0 or later)
+- **[Node.js](https://nodejs.org/)** (18.0 or later) with npm
+- **[PostgreSQL](https://www.postgresql.org/download/)** (12.0 or later)
+- **[Git](https://git-scm.com/downloads)** for version control
+
+### 🔧 Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/AbreuDotNet/ImmigraX.git
+   cd ImmigraX
+   ```
+
+2. **Setup PostgreSQL Database**
+   ```sql
+   -- Create database
+   CREATE DATABASE immigrax_db;
+   
+   -- Create user (optional)
+   CREATE USER immigrax_user WITH PASSWORD 'your_secure_password';
+   GRANT ALL PRIVILEGES ON DATABASE immigrax_db TO immigrax_user;
+   ```
+
+3. **Configure Backend**
+   ```bash
+   cd LegalApp.API
+   
+   # Update connection string in appsettings.json
+   # "DefaultConnection": "Host=localhost;Database=immigrax_db;Username=your_user;Password=your_password"
+   
+   # Install dependencies & run migrations
+   dotnet restore
+   dotnet ef database update
+   
+   # Start the API server
+   dotnet run
+   ```
+   
+   🌐 **API will be available at:** `http://localhost:5109`  
+   📚 **Swagger documentation:** `http://localhost:5109/swagger`
+
+4. **Configure Frontend**
+   ```bash
+   cd ../immigrax-client
+   
+   # Install dependencies
+   npm install
+   
+   # Optional: Create .env file for custom API URL
+   echo "REACT_APP_API_URL=http://localhost:5109/api" > .env
+   
+   # Start development server
+   npm start
+   ```
+   
+   🌐 **Client will be available at:** `http://localhost:3000`
+
+### ⚡ Quick Start (Windows)
+
+For Windows users, use the automated startup script:
+
+```powershell
+# Run from project root
+.\start-app.ps1
+```
+
+This script will automatically start both the API server and React development server.
+
+## 🔐 Demo Credentials
+
+The system comes with pre-configured demo accounts for testing:
+
+| Role | Email | Password | Access Level |
+|------|-------|----------|-------------|
+| 👑 **Master** | `dabreu@synerxrd.com` | `Master123!` | Full system access |
+| ⚖️ **Lawyer** | `maria.gonzalez@immigrax.com` | `Abogado123!` | Case & client management |
+| 📋 **Secretary** | `ana@immigrax.com` | `Secretario123!` | Limited administrative access |
+
+## 🎯 Core Features
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+### 📊 **Executive Dashboard**
+- Real-time business metrics & KPIs
+- Interactive data visualizations
+- Case status distribution charts
+- Revenue tracking & forecasting
+- Recent activity timeline
+- Alert notifications system
+
+</td>
+<td width="33%" valign="top">
+
+### 👥 **Client Management**
+- Complete client lifecycle management
+- Advanced search & filtering capabilities
+- Case history & document tracking
+- Communication logs & notes
+- Immigration process status tracking
+- Multi-language client support
+
+</td>
+<td width="33%" valign="top">
+
+### 📋 **DS-160 Form System**
+- Dynamic form generation engine
+- Section-based form organization
+- Conditional field logic
+- Document upload requirements
+- Form progress tracking
+- Email notification workflows
+
+</td>
+</tr>
+<tr>
+<td width="33%" valign="top">
+
+### 📅 **Appointment Scheduling**
+- Integrated calendar management
+- Appointment status workflows
+- Automated reminder notifications
+- Client self-scheduling portal
+- Calendar synchronization
+- Conflict resolution system
+
+</td>
+<td width="33%" valign="top">
+
+### 📄 **Document Management**
+- Secure file upload & storage
+- Document categorization system
+- Version control & audit trails
+- Role-based access permissions
+- Bulk document operations
+- Integration with case files
+
+</td>
+<td width="33%" valign="top">
+
+### 📈 **Reports & Analytics**
+- Executive summary reports
+- Case performance analytics
+- Revenue & billing insights
+- Productivity metrics
+- Custom report builder
+- Data export capabilities
+
+</td>
+</tr>
+</table>
+
+## 📋 Form Management System
+
+ImmigraX includes a comprehensive **DS-160 Form Management System** that handles the complete lifecycle of US immigration forms:
+
+### 🏗️ **Architecture**
+- **9-table relational structure** for maximum flexibility
+- **Multi-tenant design** with law firm isolation
+- **Dynamic field generation** based on form templates
+- **Conditional logic engine** for smart form behavior
+
+### 📝 **Features**
+- ✅ **Form Templates**: Create reusable form structures
+- ✅ **Section Management**: Organize forms into logical sections
+- ✅ **Field Types**: Support for text, dropdown, checkbox, file upload, and more
+- ✅ **Document Requirements**: Define and track required supporting documents
+- ✅ **Client Access**: Secure token-based form access for clients
+- ✅ **Progress Tracking**: Real-time completion percentage monitoring
+- ✅ **Audit Trail**: Complete history of form changes and submissions
+
+## 🔒 Security & Compliance
+
+- **🔐 JWT Authentication**: Secure token-based authentication system
+- **👤 Role-Based Access Control**: Granular permissions by user role
+- **🏢 Multi-Tenant Architecture**: Complete data isolation between law firms
+- **🛡️ Rate Limiting**: API protection against abuse and DoS attacks
+- **📝 Audit Logging**: Comprehensive activity tracking and compliance reporting
+- **🔒 Data Encryption**: Secure handling of sensitive client information
+
+## 📚 API Documentation
+
+Once the backend is running, access the comprehensive API documentation:
+
+🌐 **Interactive Swagger UI**: [`http://localhost:5109/swagger`](http://localhost:5109/swagger)
+
+### 🔗 **Key Endpoints**
+
+| Endpoint | Description | Authentication |
+|----------|-------------|----------------|
+| `POST /api/auth/login` | User authentication | ❌ Public |
+| `GET /api/dashboard` | Executive metrics | ✅ Required |
+| `GET /api/clients` | Client management | ✅ Required |
+| `GET /api/forms/templates` | Form templates | ✅ Required |
+| `POST /api/forms/send-to-client` | Send forms to clients | ✅ Required |
+| `GET /api/forms/public/{token}` | Client form access | ❌ Public |
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Here's how you can help:
+
+### 🚀 **Getting Started**
+
+1. **Fork the repository** on GitHub
+2. **Clone your fork** locally:
+   ```bash
+   git clone https://github.com/your-username/ImmigraX.git
+   ```
+3. **Create a feature branch**:
+   ```bash
+   git checkout -b feature/amazing-new-feature
+   ```
+4. **Make your changes** and commit them:
+   ```bash
+   git commit -m "feat: add amazing new feature"
+   ```
+5. **Push to your fork**:
+   ```bash
+   git push origin feature/amazing-new-feature
+   ```
+6. **Create a Pull Request** on GitHub
+
+### 📋 **Contribution Guidelines**
+
+- Follow the existing code style and conventions
+- Write clear, descriptive commit messages
+- Include tests for new functionality
+- Update documentation as needed
+- Ensure all tests pass before submitting
+
+### 🐛 **Reporting Issues**
+
+Found a bug? Please [open an issue](https://github.com/AbreuDotNet/ImmigraX/issues) with:
+- Clear description of the problem
+- Steps to reproduce the issue
+- Expected vs actual behavior
+- System information (OS, browser, etc.)
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+## 💬 Support & Contact
+
+### 🆘 **Get Help**
+- 📧 **Email**: [dabreu@synerxrd.com](mailto:dabreu@synerxrd.com)
+- 🐱 **GitHub**: [@AbreuDotNet](https://github.com/AbreuDotNet)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/AbreuDotNet/ImmigraX/issues)
+
+### 🤝 **Professional Services**
+Need custom implementation or enterprise support? Contact us for:
+- Custom feature development
+- Enterprise deployment assistance
+- Training and consultation services
+- Technical support and maintenance
+
+## 🗺️ Roadmap
+
+### 🎯 **Current Quarter**
+- [ ] **Mobile Application** - React Native app for iOS/Android
+- [ ] **Advanced Reporting** - Custom report builder with visualizations
+- [ ] **Email Integration** - Direct email management within the platform
+
+### 🔮 **Future Plans**
+- [ ] **Billing & Invoicing Module** - Complete financial management
+- [ ] **Calendar Integration** - Google Calendar, Outlook synchronization
+- [ ] **Push Notifications** - Real-time browser and mobile notifications
+- [ ] **Government API Integration** - Direct integration with USCIS systems
+- [ ] **AI-Powered Analytics** - Predictive case outcome analysis
+- [ ] **Multi-Language Support** - Spanish, French, and other languages
+- [ ] **White-Label Solution** - Customizable branding for law firms
+
+---
+
+<div align="center">
+  
+### 🌟 **Star this repository if you find it helpful!** ⭐
+
+**Built with ❤️ by [Daniel Abreu](https://github.com/AbreuDotNet)**
+
+*Transforming immigration legal practice through modern technology*
+
+</div>
