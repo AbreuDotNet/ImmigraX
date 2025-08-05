@@ -20,7 +20,6 @@ import {
   CardContent,
   CardActions,
   Avatar,
-  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -258,17 +257,38 @@ const Notes: React.FC = () => {
 
   return (
     <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1">
-          Notas de Clientes
-        </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        <Box>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: 'text.primary' }}>
+            📝 Notas de Clientes
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+            Gestiona y organiza todas las notas importantes de tus clientes
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setOpenDialog(true)}
           size="large"
+          sx={{
+            borderRadius: 3,
+            px: 3,
+            py: 1.5,
+            textTransform: 'none',
+            fontSize: '1rem',
+            fontWeight: 600,
+            boxShadow: 3,
+            background: 'linear-gradient(45deg, #FF6B6B 30%, #FF8E8E 90%)',
+            '&:hover': {
+              boxShadow: 6,
+              transform: 'translateY(-2px)',
+              background: 'linear-gradient(45deg, #FF5252 30%, #FF6B6B 90%)',
+            },
+            transition: 'all 0.3s ease'
+          }}
         >
-          Nueva Nota
+          ✨ Nueva Nota
         </Button>
       </Box>
 
@@ -278,78 +298,197 @@ const Notes: React.FC = () => {
         </Alert>
       )}
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box 
+        sx={{ 
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            md: 'repeat(2, 1fr)',
+            lg: 'repeat(3, 1fr)'
+          },
+          gap: 3
+        }}
+      >
         {notes.map((note) => (
-          <Card key={note.id} sx={{ position: 'relative' }}>
+          <Card 
+            key={note.id} 
+            sx={{ 
+              position: 'relative',
+              borderRadius: 3,
+              boxShadow: 3,
+              border: '1px solid',
+              borderColor: note.isImportant ? 'warning.light' : 'divider',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                boxShadow: 8,
+                transform: 'translateY(-4px)',
+                borderColor: note.isImportant ? 'warning.main' : 'primary.light',
+              },
+              background: note.isImportant 
+                ? 'linear-gradient(135deg, #FFF8E1 0%, #FFFFFF 100%)'
+                : 'linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Header with priority indicator */}
+            <Box
+              sx={{
+                background: note.priority === 'Crítica' 
+                  ? 'linear-gradient(45deg, #F44336 30%, #FF6B6B 90%)'
+                  : note.priority === 'Alta'
+                  ? 'linear-gradient(45deg, #FF9800 30%, #FFB74D 90%)'
+                  : note.priority === 'Media'
+                  ? 'linear-gradient(45deg, #2196F3 30%, #64B5F6 90%)'
+                  : 'linear-gradient(45deg, #4CAF50 30%, #81C784 90%)',
+                height: 6,
+                width: '100%'
+              }}
+            />
+            
+            {/* Important flag */}
             {note.isImportant && (
               <Box
                 sx={{
                   position: 'absolute',
-                  top: 8,
-                  right: 8,
-                  zIndex: 1
+                  top: 16,
+                  right: 16,
+                  zIndex: 2,
+                  backgroundColor: 'warning.main',
+                  borderRadius: '50%',
+                  p: 0.5,
+                  boxShadow: 2
                 }}
               >
-                <FlagIcon color="warning" />
+                <FlagIcon sx={{ color: 'white', fontSize: '1rem' }} />
               </Box>
             )}
             
-            <CardContent>
-              <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                <Box flex={1}>
-                  <Typography variant="h6" component="h3" gutterBottom>
-                    {note.title}
-                    {note.priority === 'Crítica' && (
-                      <HighPriorityIcon color="error" sx={{ ml: 1, verticalAlign: 'middle' }} />
-                    )}
-                  </Typography>
-                  
-                  <Box display="flex" alignItems="center" gap={2} mb={1}>
-                    <Box display="flex" alignItems="center" gap={0.5}>
-                      <PersonIcon fontSize="small" color="action" />
-                      <Typography variant="body2" color="text.secondary">
-                        {note.clientName}
-                      </Typography>
-                    </Box>
-                    
-                    <Chip 
-                      label={note.category}
-                      size="small"
-                      variant="outlined"
+            <CardContent sx={{ p: 3, pb: 1 }}>
+              {/* Title and Priority */}
+              <Box display="flex" alignItems="flex-start" justifyContent="space-between" mb={2}>
+                <Typography 
+                  variant="h6" 
+                  component="h3" 
+                  sx={{ 
+                    fontWeight: 600,
+                    color: 'text.primary',
+                    fontSize: '1.1rem',
+                    lineHeight: 1.3,
+                    pr: note.isImportant ? 5 : 0
+                  }}
+                >
+                  {note.title}
+                  {note.priority === 'Crítica' && (
+                    <HighPriorityIcon 
+                      sx={{ 
+                        ml: 1, 
+                        verticalAlign: 'middle',
+                        color: 'error.main',
+                        fontSize: '1.2rem'
+                      }} 
                     />
-                    
-                    <Chip 
-                      label={note.priority}
-                      size="small"
-                      color={priorityColors[note.priority]}
-                    />
-                  </Box>
-                </Box>
+                  )}
+                </Typography>
               </Box>
               
-              <Typography variant="body1" paragraph>
+              {/* Client and metadata */}
+              <Box display="flex" alignItems="center" gap={1} mb={2}>
+                <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 0.5,
+                    backgroundColor: 'primary.light',
+                    color: 'white',
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 2,
+                    fontSize: '0.8rem'
+                  }}
+                >
+                  <PersonIcon sx={{ fontSize: '1rem' }} />
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {note.clientName}
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* Category and Priority chips */}
+              <Box display="flex" gap={1} mb={2} flexWrap="wrap">
+                <Chip 
+                  label={note.category}
+                  size="small"
+                  variant="outlined"
+                  sx={{ 
+                    borderRadius: 1.5,
+                    fontWeight: 500,
+                    fontSize: '0.75rem'
+                  }}
+                />
+                <Chip 
+                  label={note.priority}
+                  size="small"
+                  color={priorityColors[note.priority]}
+                  sx={{ 
+                    borderRadius: 1.5,
+                    fontWeight: 600,
+                    fontSize: '0.75rem'
+                  }}
+                />
+              </Box>
+              
+              {/* Content */}
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: 'text.secondary',
+                  lineHeight: 1.5,
+                  mb: 2,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
                 {note.content}
               </Typography>
               
-              <Divider sx={{ my: 2 }} />
-              
-              <Box display="flex" justifyContent="space-between" alignItems="center">
+              {/* Footer with author and date */}
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  pt: 2,
+                  borderTop: '1px solid',
+                  borderColor: 'divider',
+                  mt: 2
+                }}
+              >
                 <Box display="flex" alignItems="center" gap={1}>
-                  <Avatar sx={{ width: 24, height: 24, fontSize: '0.75rem' }}>
+                  <Avatar 
+                    sx={{ 
+                      width: 28, 
+                      height: 28, 
+                      fontSize: '0.75rem',
+                      backgroundColor: 'primary.main'
+                    }}
+                  >
                     {note.createdBy.charAt(0)}
                   </Avatar>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
                     {note.createdBy}
                   </Typography>
                 </Box>
                 
                 <Box display="flex" alignItems="center" gap={0.5}>
-                  <TimeIcon fontSize="small" color="action" />
-                  <Typography variant="body2" color="text.secondary">
+                  <TimeIcon sx={{ fontSize: '1rem', color: 'text.disabled' }} />
+                  <Typography variant="caption" color="text.secondary">
                     {formatDate(note.createdAt)}
                   </Typography>
                   {note.updatedAt !== note.createdAt && (
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="caption" color="warning.main" sx={{ ml: 0.5, fontStyle: 'italic' }}>
                       (editado)
                     </Typography>
                   )}
@@ -357,20 +496,41 @@ const Notes: React.FC = () => {
               </Box>
             </CardContent>
             
-            <CardActions>
+            <CardActions sx={{ px: 3, pb: 2, pt: 0, justifyContent: 'flex-end' }}>
               <IconButton 
                 size="small" 
-                color="primary"
                 onClick={() => handleEditNote(note)}
+                sx={{
+                  backgroundColor: 'info.light',
+                  color: 'white',
+                  width: 32,
+                  height: 32,
+                  '&:hover': {
+                    backgroundColor: 'info.main',
+                    transform: 'scale(1.1)',
+                  },
+                  transition: 'all 0.2s ease'
+                }}
               >
-                <EditIcon />
+                <EditIcon sx={{ fontSize: '1rem' }} />
               </IconButton>
               <IconButton 
                 size="small" 
-                color="error"
                 onClick={() => handleDeleteNote(note.id)}
+                sx={{
+                  backgroundColor: 'error.light',
+                  color: 'white',
+                  width: 32,
+                  height: 32,
+                  ml: 1,
+                  '&:hover': {
+                    backgroundColor: 'error.main',
+                    transform: 'scale(1.1)',
+                  },
+                  transition: 'all 0.2s ease'
+                }}
               >
-                <DeleteIcon />
+                <DeleteIcon sx={{ fontSize: '1rem' }} />
               </IconButton>
             </CardActions>
           </Card>
@@ -378,33 +538,109 @@ const Notes: React.FC = () => {
       </Box>
 
       {notes.length === 0 && (
-        <Paper sx={{ p: 4, textAlign: 'center', mt: 3 }}>
-          <NotesIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-          <Typography variant="h6" color="text.secondary">
-            No hay notas disponibles
-          </Typography>
-          <Typography color="text.secondary">
-            Crea tu primera nota para comenzar
-          </Typography>
+        <Paper 
+          sx={{ 
+            p: 6, 
+            textAlign: 'center', 
+            mt: 4,
+            borderRadius: 3,
+            border: '2px dashed',
+            borderColor: 'divider',
+            backgroundColor: 'grey.50'
+          }}
+        >
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2
+          }}>
+            <Box sx={{
+              backgroundColor: 'primary.light',
+              borderRadius: '50%',
+              p: 3,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <NotesIcon sx={{ fontSize: 64, color: 'white' }} />
+            </Box>
+            <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
+              📝 No hay notas disponibles
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
+              Comienza creando tu primera nota para organizar información importante de tus clientes
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenDialog(true)}
+              sx={{
+                mt: 2,
+                px: 4,
+                py: 1.5,
+                borderRadius: 3,
+                textTransform: 'none',
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                background: 'linear-gradient(45deg, #FF6B6B 30%, #FF8E8E 90%)',
+                '&:hover': {
+                  background: 'linear-gradient(45deg, #FF5252 30%, #FF6B6B 90%)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: 6,
+                },
+                transition: 'all 0.3s ease'
+              }}
+            >
+              🚀 Crear Primera Nota
+            </Button>
+          </Box>
         </Paper>
       )}
 
       {/* Dialog para crear/editar nota */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle>
-          {editingNote ? 'Editar Nota' : 'Nueva Nota'}
+      <Dialog 
+        open={openDialog} 
+        onClose={handleCloseDialog} 
+        maxWidth="md" 
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            borderRadius: 3,
+            boxShadow: 24,
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          backgroundColor: 'primary.main', 
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          fontSize: '1.25rem',
+          fontWeight: 600
+        }}>
+          <NotesIcon />
+          {editingNote ? '✏️ Editar Nota' : '📝 Nueva Nota'}
         </DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+        <DialogContent sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
             <FormControl fullWidth>
-              <InputLabel>Cliente</InputLabel>
+              <InputLabel id="client-select-label" sx={{ fontWeight: 500 }}>👤 Cliente</InputLabel>
               <Select
+                labelId="client-select-label"
+                label="👤 Cliente"
                 value={newNote.clientId}
                 onChange={(e) => setNewNote(prev => ({...prev, clientId: e.target.value}))}
+                sx={{ borderRadius: 2 }}
               >
                 {clients.map((client) => (
                   <MenuItem key={client.id} value={client.id}>
-                    {client.fullName}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <PersonIcon color="primary" />
+                      {client.fullName}
+                    </Box>
                   </MenuItem>
                 ))}
               </Select>
@@ -412,17 +648,29 @@ const Notes: React.FC = () => {
             
             <TextField
               fullWidth
-              label="Título"
+              label="📝 Título de la Nota"
               value={newNote.title}
               onChange={(e) => setNewNote(prev => ({...prev, title: e.target.value}))}
+              sx={{ 
+                '& .MuiOutlinedInput-root': { 
+                  borderRadius: 2 
+                },
+                '& .MuiInputLabel-root': {
+                  fontWeight: 500
+                }
+              }}
+              placeholder="Escribe un título descriptivo para la nota..."
             />
             
             <Box sx={{ display: 'flex', gap: 2 }}>
               <FormControl fullWidth>
-                <InputLabel>Categoría</InputLabel>
+                <InputLabel id="category-select-label" sx={{ fontWeight: 500 }}>📂 Categoría</InputLabel>
                 <Select
+                  labelId="category-select-label"
+                  label="📂 Categoría"
                   value={newNote.category}
                   onChange={(e) => setNewNote(prev => ({...prev, category: e.target.value}))}
+                  sx={{ borderRadius: 2 }}
                 >
                   {noteCategories.map((category) => (
                     <MenuItem key={category} value={category}>
@@ -433,51 +681,117 @@ const Notes: React.FC = () => {
               </FormControl>
               
               <FormControl fullWidth>
-                <InputLabel>Prioridad</InputLabel>
+                <InputLabel id="priority-select-label" sx={{ fontWeight: 500 }}>⚡ Prioridad</InputLabel>
                 <Select
+                  labelId="priority-select-label"
+                  label="⚡ Prioridad"
                   value={newNote.priority}
                   onChange={(e) => setNewNote(prev => ({...prev, priority: e.target.value as Note['priority']}))}
+                  sx={{ borderRadius: 2 }}
                 >
-                  <MenuItem value="Baja">Baja</MenuItem>
-                  <MenuItem value="Media">Media</MenuItem>
-                  <MenuItem value="Alta">Alta</MenuItem>
-                  <MenuItem value="Crítica">Crítica</MenuItem>
+                  <MenuItem value="Baja">🟢 Baja</MenuItem>
+                  <MenuItem value="Media">🔵 Media</MenuItem>
+                  <MenuItem value="Alta">🟡 Alta</MenuItem>
+                  <MenuItem value="Crítica">🔴 Crítica</MenuItem>
                 </Select>
               </FormControl>
             </Box>
             
             <TextField
               fullWidth
-              label="Contenido"
+              label="💬 Contenido de la Nota"
               multiline
               rows={6}
               value={newNote.content}
               onChange={(e) => setNewNote(prev => ({...prev, content: e.target.value}))}
+              sx={{ 
+                '& .MuiOutlinedInput-root': { 
+                  borderRadius: 2 
+                },
+                '& .MuiInputLabel-root': {
+                  fontWeight: 500
+                }
+              }}
+              placeholder="Escribe el contenido detallado de la nota..."
             />
             
-            <Box display="flex" alignItems="center">
-              <input
-                type="checkbox"
-                id="important-checkbox"
-                checked={newNote.isImportant}
-                onChange={(e) => setNewNote(prev => ({...prev, isImportant: e.target.checked}))}
-              />
-              <label htmlFor="important-checkbox" style={{ marginLeft: 8 }}>
-                <Typography variant="body2">
-                  Marcar como importante
-                </Typography>
-              </label>
-            </Box>
+            <Paper
+              elevation={0}
+              sx={{
+                border: '1px solid',
+                borderColor: newNote.isImportant ? 'warning.main' : 'divider',
+                borderRadius: 2,
+                p: 2,
+                backgroundColor: newNote.isImportant ? 'warning.50' : 'grey.50',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': { 
+                  borderColor: newNote.isImportant ? 'warning.dark' : 'primary.main',
+                  backgroundColor: newNote.isImportant ? 'warning.100' : 'primary.50',
+                }
+              }}
+              onClick={() => setNewNote(prev => ({...prev, isImportant: !prev.isImportant}))}
+            >
+              <Box display="flex" alignItems="center" gap={2}>
+                <Box sx={{
+                  backgroundColor: newNote.isImportant ? 'warning.main' : 'grey.400',
+                  borderRadius: '50%',
+                  p: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <FlagIcon sx={{ color: 'white', fontSize: '1.2rem' }} />
+                </Box>
+                <Box>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                    {newNote.isImportant ? '🚩 Nota Importante' : '📄 Nota Regular'}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {newNote.isImportant 
+                      ? 'Esta nota se destacará visualmente en la lista'
+                      : 'Haz clic para marcar esta nota como importante'
+                    }
+                  </Typography>
+                </Box>
+              </Box>
+            </Paper>
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancelar</Button>
+        <DialogActions sx={{ p: 3, gap: 2 }}>
+          <Button 
+            onClick={handleCloseDialog}
+            variant="outlined"
+            sx={{ 
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 500,
+              px: 3
+            }}
+          >
+            ❌ Cancelar
+          </Button>
           <Button 
             onClick={handleSaveNote} 
             variant="contained"
             disabled={!newNote.clientId || !newNote.title || !newNote.content}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 4,
+              background: 'linear-gradient(45deg, #4CAF50 30%, #66BB6A 90%)',
+              '&:hover': {
+                background: 'linear-gradient(45deg, #388E3C 30%, #4CAF50 90%)',
+                boxShadow: 6,
+              },
+              '&:disabled': {
+                background: 'grey.300',
+                color: '#ffffff'
+              }
+            }}
           >
-            {editingNote ? 'Actualizar' : 'Crear'} Nota
+            {editingNote ? '💾 Actualizar Nota' : '🚀 Crear Nota'}
           </Button>
         </DialogActions>
       </Dialog>

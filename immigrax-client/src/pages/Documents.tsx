@@ -509,8 +509,8 @@ const Documents: React.FC = () => {
                             </Typography>
                           }
                           secondary={
-                            <Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.85rem' }}>
+                            <Box component="div">
+                              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.85rem' }} component="div">
                                 📊 <strong>Tamaño:</strong> {formatFileSize(document.fileSize)} • 
                                 📅 <strong>Subido:</strong> {new Date(document.uploadedAt).toLocaleDateString('es-ES', {
                                   year: 'numeric',
@@ -520,7 +520,8 @@ const Documents: React.FC = () => {
                               </Typography>
                               {document.description && (
                                 <Typography 
-                                  variant="body2" 
+                                  variant="body2"
+                                  component="div"
                                   sx={{ 
                                     mt: 1,
                                     p: 1.5,
