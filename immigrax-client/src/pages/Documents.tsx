@@ -360,7 +360,7 @@ const Documents: React.FC = () => {
           <Paper 
             key={clientId} 
             sx={{ 
-              mb: 3, 
+              mb: 2, // Margen inferior reducido
               borderRadius: 2,
               border: '1px solid',
               borderColor: 'divider',
@@ -379,12 +379,12 @@ const Documents: React.FC = () => {
                   backgroundColor: 'grey.50',
                   borderBottom: '1px solid',
                   borderColor: 'divider',
-                  minHeight: 72,
+                  minHeight: 64, // Altura reducida del accordion header
                   '&:hover': {
                     backgroundColor: 'grey.100',
                   },
                   '& .MuiAccordionSummary-content': {
-                    margin: '16px 0',
+                    margin: '12px 0', // Margen reducido
                   },
                 }}
               >
@@ -395,46 +395,22 @@ const Documents: React.FC = () => {
                     backgroundColor: 'primary.main',
                     color: 'white',
                     borderRadius: '50%',
-                    width: 48,
-                    height: 48,
-                    mr: 3,
+                    width: 40, // Tamaño reducido del avatar
+                    height: 40,
+                    mr: 2.5, // Margen reducido
                     justifyContent: 'center'
                   }}>
-                    <PersonIcon />
+                    <PersonIcon sx={{ fontSize: '1.2rem' }} />
                   </Box>
                   
                   <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '1.1rem' }}>
                       {getClientName(clientId)}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
                       {clientDocuments.length} documento{clientDocuments.length !== 1 ? 's' : ''} subido{clientDocuments.length !== 1 ? 's' : ''}
                     </Typography>
                   </Box>
-
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<AddIcon />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setNewDocument(prev => ({ ...prev, clientId }));
-                      setOpenDialog(true);
-                    }}
-                    sx={{ 
-                      mr: 2,
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      fontSize: '0.875rem',
-                      '&:hover': {
-                        backgroundColor: 'primary.light',
-                        color: 'white',
-                        borderColor: 'primary.light',
-                      }
-                    }}
-                  >
-                    Agregar Documento
-                  </Button>
                   
                   <Chip 
                     label={clientDocuments.length}
@@ -442,14 +418,49 @@ const Documents: React.FC = () => {
                     variant="filled"
                     size="small"
                     sx={{ 
-                      minWidth: 24,
-                      height: 24,
-                      fontSize: '0.75rem',
+                      minWidth: 20, // Ancho mínimo reducido
+                      height: 20, // Altura reducida
+                      fontSize: '0.7rem', // Fuente más pequeña
                       fontWeight: 'bold'
                     }}
                   />
                 </Box>
               </AccordionSummary>
+              
+              {/* Botón agregar fuera del AccordionSummary */}
+              <Box sx={{ 
+                px: 3, 
+                py: 1, 
+                backgroundColor: 'grey.50', 
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+                display: 'flex',
+                justifyContent: 'flex-end'
+              }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<AddIcon sx={{ fontSize: '1rem' }} />}
+                  onClick={() => {
+                    setNewDocument(prev => ({ ...prev, clientId }));
+                    setOpenDialog(true);
+                  }}
+                  sx={{ 
+                    borderRadius: 1.5, // Border radius más pequeño
+                    textTransform: 'none',
+                    fontSize: '0.8rem', // Fuente más pequeña
+                    py: 0.5, // Padding vertical reducido
+                    px: 1.5, // Padding horizontal reducido
+                    '&:hover': {
+                      backgroundColor: 'primary.light',
+                      color: 'white',
+                      borderColor: 'primary.light',
+                    }
+                  }}
+                >
+                  Agregar Documento
+                </Button>
+              </Box>
               
               <AccordionDetails sx={{ p: 0, backgroundColor: 'background.paper' }}>
                 <List sx={{ width: '100%' }}>
@@ -457,58 +468,53 @@ const Documents: React.FC = () => {
                     <React.Fragment key={document.id}>
                       <ListItem
                         sx={{
-                          py: 3,
+                          py: 2,
                           px: 3,
                           transition: 'background-color 0.2s ease',
                           '&:hover': {
                             backgroundColor: 'action.hover',
                           },
+                          minHeight: 90, // Altura ajustada para el nuevo layout vertical
+                          alignItems: 'flex-start' // Alinear elementos al inicio
                         }}
                       >
-                        <ListItemIcon sx={{ minWidth: 56 }}>
+                        <ListItemIcon sx={{ minWidth: 56, alignSelf: 'flex-start', mt: 0.5 }}>
                           <Box sx={{
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            width: 40,
+                            width: 40, // Tamaño reducido del icono
                             height: 40,
-                            borderRadius: 2,
-                            backgroundColor: 'primary.light',
-                            color: 'primary.contrastText'
+                            borderRadius: 2.5, // Border radius más pequeño
+                            color: 'primary.main',
+                            boxShadow: 1 // Sombra reducida
                           }}>
                             {getFileIcon(document.fileType)}
                           </Box>
                         </ListItemIcon>
                         
                         <ListItemText
+                          sx={{ pr: 0, flex: 1 }} // Sin padding derecho, flex normal
                           primary={
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                              <Typography 
-                                variant="subtitle1" 
-                                sx={{ 
-                                  fontWeight: 600,
-                                  color: 'text.primary',
-                                  flexGrow: 1
-                                }}
-                              >
-                                {document.originalFileName}
-                              </Typography>
-                              <Chip 
-                                label={document.documentType}
-                                color={getDocumentTypeColor(document.documentType)}
-                                size="small"
-                                variant="outlined"
-                                sx={{ fontWeight: 500 }}
-                              />
-                            </Box>
+                            <Typography 
+                              variant="subtitle1" 
+                              sx={{ 
+                                fontWeight: 600,
+                                color: 'text.primary',
+                                fontSize: '1rem',
+                                mb: 0.5
+                              }}
+                            >
+                              {document.originalFileName}
+                            </Typography>
                           }
                           secondary={
                             <Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                                📊 Tamaño: {formatFileSize(document.fileSize)} • 
-                                📅 Subido: {new Date(document.uploadedAt).toLocaleDateString('es-ES', {
+                              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.85rem' }}>
+                                📊 <strong>Tamaño:</strong> {formatFileSize(document.fileSize)} • 
+                                📅 <strong>Subido:</strong> {new Date(document.uploadedAt).toLocaleDateString('es-ES', {
                                   year: 'numeric',
-                                  month: 'long',
+                                  month: 'short',
                                   day: 'numeric'
                                 })}
                               </Typography>
@@ -519,14 +525,18 @@ const Documents: React.FC = () => {
                                     mt: 1,
                                     p: 1.5,
                                     backgroundColor: 'grey.50',
-                                    borderRadius: 1,
+                                    borderRadius: 1.5,
                                     fontStyle: 'italic',
                                     color: 'text.secondary',
                                     border: '1px solid',
-                                    borderColor: 'divider'
+                                    borderColor: 'divider',
+                                    fontSize: '0.8rem',
+                                    lineHeight: 1.3,
+                                    width: 'fit-content', // Ancho ajustado al contenido
+                                    maxWidth: '100%'
                                   }}
                                 >
-                                  💬 {document.description}
+                                  💬 <strong>Descripción:</strong> {document.description}
                                 </Typography>
                               )}
                             </Box>
@@ -534,55 +544,100 @@ const Documents: React.FC = () => {
                         />
                         
                         <ListItemSecondaryAction>
-                          <Box sx={{ display: 'flex', gap: 1 }}>
-                            <IconButton 
-                              size="small" 
-                              color="primary"
-                              title="Visualizar documento"
-                              sx={{
-                                backgroundColor: 'primary.light',
-                                color: 'white',
-                                '&:hover': {
-                                  backgroundColor: 'primary.main',
-                                }
+                          <Box sx={{ 
+                            display: 'flex', 
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 1
+                          }}>
+                            {/* Chip del tipo de documento centrado */}
+                            <Chip 
+                              label={document.documentType}
+                              color={getDocumentTypeColor(document.documentType)}
+                              size="small"
+                              variant="outlined"
+                              sx={{ 
+                                fontWeight: 600,
+                                fontSize: '0.75rem',
+                                height: 24,
+                                mb: 0.5
                               }}
-                            >
-                              <ViewIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton 
-                              size="small" 
-                              color="success"
-                              title="Descargar documento"
-                              sx={{
-                                backgroundColor: 'success.light',
-                                color: 'white',
-                                '&:hover': {
-                                  backgroundColor: 'success.main',
-                                }
-                              }}
-                            >
-                              <DownloadIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton 
-                              size="small" 
-                              color="error"
-                              title="Eliminar documento"
-                              sx={{
-                                backgroundColor: 'error.light',
-                                color: 'white',
-                                '&:hover': {
-                                  backgroundColor: 'error.main',
-                                }
-                              }}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
+                            />
+                            
+                            {/* Botones de acción */}
+                            <Box sx={{ 
+                              display: 'flex', 
+                              gap: 0.5,
+                              alignItems: 'center'
+                            }}>
+                              <IconButton 
+                                size="small" 
+                                title="Visualizar documento"
+                                sx={{
+                                  backgroundColor: 'info.light',
+                                  color: 'white',
+                                  width: 32,
+                                  height: 32,
+                                  '&:hover': {
+                                    backgroundColor: 'info.main',
+                                    transform: 'scale(1.05)',
+                                  },
+                                  transition: 'all 0.2s ease'
+                                }}
+                              >
+                                <ViewIcon sx={{ fontSize: '1rem' }} />
+                              </IconButton>
+                              <IconButton 
+                                size="small" 
+                                title="Descargar documento"
+                                sx={{
+                                  backgroundColor: 'success.light',
+                                  color: 'white',
+                                  width: 32,
+                                  height: 32,
+                                  '&:hover': {
+                                    backgroundColor: 'success.main',
+                                    transform: 'scale(1.05)',
+                                  },
+                                  transition: 'all 0.2s ease'
+                                }}
+                              >
+                                <DownloadIcon sx={{ fontSize: '1rem' }} />
+                              </IconButton>
+                              <IconButton 
+                                size="small" 
+                                title="Eliminar documento"
+                                sx={{
+                                  backgroundColor: 'error.light',
+                                  color: 'white',
+                                  width: 32,
+                                  height: 32,
+                                  '&:hover': {
+                                    backgroundColor: 'error.main',
+                                    transform: 'scale(1.05)',
+                                  },
+                                  transition: 'all 0.2s ease'
+                                }}
+                              >
+                                <DeleteIcon sx={{ fontSize: '1rem' }} />
+                              </IconButton>
+                            </Box>
                           </Box>
                         </ListItemSecondaryAction>
                       </ListItem>
                       
                       {index < clientDocuments.length - 1 && (
-                        <Divider sx={{ mx: 3 }} />
+                        <Divider 
+                          sx={{ 
+                            mx: 2, // Margen horizontal reducido
+                            my: 0.5, // Margen vertical reducido
+                            borderColor: 'divider',
+                            '&::before, &::after': {
+                              borderColor: 'primary.light',
+                            }
+                          }} 
+                          variant="middle"
+                        />
                       )}
                     </React.Fragment>
                   ))}
