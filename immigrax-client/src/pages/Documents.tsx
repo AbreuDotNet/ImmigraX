@@ -759,8 +759,10 @@ const Documents: React.FC = () => {
         <DialogContent sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
             <FormControl fullWidth>
-              <InputLabel sx={{ fontWeight: 500 }}>👤 Cliente</InputLabel>
+              <InputLabel id="client-select-label" sx={{ fontWeight: 500 }}>👤 Cliente</InputLabel>
               <Select
+                labelId="client-select-label"
+                label="👤 Cliente"
                 value={newDocument.clientId}
                 onChange={(e) => setNewDocument(prev => ({...prev, clientId: e.target.value}))}
                 sx={{ borderRadius: 2 }}
@@ -777,8 +779,10 @@ const Documents: React.FC = () => {
             </FormControl>
             
             <FormControl fullWidth>
-              <InputLabel sx={{ fontWeight: 500 }}>📋 Tipo de Documento</InputLabel>
+              <InputLabel id="document-type-select-label" sx={{ fontWeight: 500 }}>📋 Tipo de Documento</InputLabel>
               <Select
+                labelId="document-type-select-label"
+                label="📋 Tipo de Documento"
                 value={newDocument.documentType}
                 onChange={(e) => setNewDocument(prev => ({...prev, documentType: e.target.value}))}
                 sx={{ borderRadius: 2 }}
@@ -899,7 +903,7 @@ const Documents: React.FC = () => {
               },
               '&:disabled': {
                 background: 'grey.300',
-                color: 'grey.500'
+                color: '#ffffff'
               }
             }}
           >
