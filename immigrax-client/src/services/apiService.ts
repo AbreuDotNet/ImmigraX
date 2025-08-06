@@ -312,6 +312,26 @@ class ApiService {
   async sendFormReminder(formId: string): Promise<void> {
     await this.api.post(`/forms/${formId}/send-reminder`);
   }
+
+  async getCurrentLawFirm(): Promise<{ id: string; name: string; address: string; phone: string }> {
+    const response: AxiosResponse<{ id: string; name: string; address: string; phone: string }> = 
+      await this.api.get('/dashboard/lawfirm');
+    return response.data;
+  }
+
+  async getActivityLog(clientId?: string, limit: number = 10): Promise<any[]> {
+    const params = new URLSearchParams();
+    if (clientId) params.append('clientId', clientId);
+    params.append('limit', limit.toString());
+    
+    const response: AxiosResponse<any[]> = await this.api.get(`/dashboard/activities?${params.toString()}`);
+    return response.data;
+  }
+
+  async getActivityStats(): Promise<any> {
+    const response: AxiosResponse<any> = await this.api.get('/dashboard/activities/stats');
+    return response.data;
+  }
 }
 
 // Create and export a singleton instance

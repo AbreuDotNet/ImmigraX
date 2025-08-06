@@ -19,6 +19,7 @@ import {
   Container,
   Fab,
   Avatar,
+  Tooltip,
 } from '@mui/material';
 import {
   Add,
@@ -27,10 +28,14 @@ import {
   Visibility,
   Event,
   Schedule,
+  Delete,
 } from '@mui/icons-material';
 import { Appointment, AppointmentStatus } from '../types';
 import apiService from '../services/apiService';
 import ApiStatus from '../components/ApiStatus';
+import AppointmentForm from '../components/AppointmentForm';
+import AppointmentDetails from '../components/AppointmentDetails';
+import AppointmentDeleteConfirm from '../components/AppointmentDeleteConfirm';
 
 // Mock data for development
 const mockAppointments: AppointmentWithClient[] = [
@@ -102,31 +107,111 @@ const Appointments: React.FC = () => {
   const [appointments, setAppointments] = useState<AppointmentWithClient[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Form states
+  const [formOpen, setFormOpen] = useState(false);
+  const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  
+  // Details modal states
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [detailsAppointmentId, setDetailsAppointmentId] = useState<string | null>(null);
+  
+  // Delete confirmation states
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        // Try to fetch real data from API
-        const appointmentsData = await apiService.getAppointments();
-        // For now, we'll add mock client names since the API doesn't include them
-        const appointmentsWithClients = appointmentsData.map((apt, index) => ({
-          ...apt,
-          clientName: mockAppointments[index]?.clientName || 'Cliente Desconocido',
-          duration: 60 // Default duration
-        }));
-        setAppointments(appointmentsWithClients);
-      } catch (err) {
-        console.warn('API not available, using mock data:', err);
-        // Fallback to mock data if API is not available
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setAppointments(mockAppointments);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAppointments();
   }, []);
+
+  const fetchAppointments = async () => {
+    try {
+      setLoading(true);
+      // Try to fetch real data from API
+      const appointmentsData = await apiService.getAppointments();
+      // For now, we'll add mock client names since the API might not include them
+      const appointmentsWithClients = appointmentsData.map((apt, index) => ({
+        ...apt,
+        clientName: mockAppointments[index]?.clientName || 'Cliente Desconocido',
+        duration: 60 // Default duration
+      }));
+      setAppointments(appointmentsWithClients);
+    } catch (err) {
+      console.warn('API not available, using mock data:', err);
+      // Fallback to mock data if API is not available
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setAppointments(mockAppointments);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateAppointment = () => {
+    setSelectedAppointment(null);
+    setFormMode('create');
+    setFormOpen(true);
+  };
+
+  const handleEditAppointment = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setFormMode('edit');
+    setFormOpen(true);
+  };
+
+  const handleViewAppointment = (appointmentId: string) => {
+    setDetailsAppointmentId(appointmentId);
+    setDetailsOpen(true);
+  };
+
+  const handleDeleteAppointment = (appointment: Appointment) => {
+    setAppointmentToDelete(appointment);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!appointmentToDelete) return;
+
+    setDeleteLoading(true);
+    try {
+      await apiService.deleteAppointment(appointmentToDelete.id);
+      setAppointments(prev => prev.filter(apt => apt.id !== appointmentToDelete.id));
+      setDeleteConfirmOpen(false);
+      setAppointmentToDelete(null);
+    } catch (error) {
+      console.error('Error deleting appointment:', error);
+      // Handle error (show toast, etc.)
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleFormSubmit = (appointment: Appointment) => {
+    if (formMode === 'create') {
+      const newAppointment = {
+        ...appointment,
+        clientName: 'Nuevo Cliente', // TODO: Get from client data
+        duration: 60
+      };
+      setAppointments(prev => [newAppointment, ...prev]);
+    } else {
+      setAppointments(prev =>
+        prev.map(apt =>
+          apt.id === appointment.id
+            ? { ...appointment, clientName: apt.clientName, duration: apt.duration }
+            : apt
+        )
+      );
+    }
+  };
+
+  const handleDetailsEdit = (appointment: Appointment) => {
+    setDetailsOpen(false);
+    setTimeout(() => {
+      handleEditAppointment(appointment);
+    }, 200);
+  };
 
   const filteredAppointments = appointments.filter(appointment =>
     appointment.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -180,7 +265,7 @@ const Appointments: React.FC = () => {
         <Button
           variant="contained"
           startIcon={<Add />}
-          onClick={() => {/* TODO: Open create appointment modal */}}
+          onClick={handleCreateAppointment}
         >
           Nueva Cita
         </Button>
@@ -280,20 +365,67 @@ const Appointments: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell align="right">
-                        <IconButton
-                          size="small"
-                          onClick={() => {/* TODO: View appointment details */}}
-                          title="Ver detalles"
-                        >
-                          <Visibility />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => {/* TODO: Edit appointment */}}
-                          title="Editar cita"
-                        >
-                          <Edit />
-                        </IconButton>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Tooltip title="Ver detalles">
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewAppointment(appointment.id);
+                              }}
+                              sx={{
+                                color: 'primary.main',
+                                '&:hover': {
+                                  backgroundColor: 'primary.50',
+                                  transform: 'scale(1.1)',
+                                },
+                                transition: 'all 0.2s ease-in-out',
+                              }}
+                            >
+                              <Visibility />
+                            </IconButton>
+                          </Tooltip>
+                          
+                          <Tooltip title="Editar">
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditAppointment(appointment);
+                              }}
+                              sx={{
+                                color: 'warning.main',
+                                '&:hover': {
+                                  backgroundColor: 'warning.50',
+                                  transform: 'scale(1.1)',
+                                },
+                                transition: 'all 0.2s ease-in-out',
+                              }}
+                            >
+                              <Edit />
+                            </IconButton>
+                          </Tooltip>
+                          
+                          <Tooltip title="Eliminar">
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteAppointment(appointment);
+                              }}
+                              sx={{
+                                color: 'error.main',
+                                '&:hover': {
+                                  backgroundColor: 'error.50',
+                                  transform: 'scale(1.1)',
+                                },
+                                transition: 'all 0.2s ease-in-out',
+                              }}
+                            >
+                              <Delete />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
                       </TableCell>
                     </TableRow>
                   );
@@ -316,10 +448,34 @@ const Appointments: React.FC = () => {
         color="primary"
         aria-label="add"
         sx={{ position: 'fixed', bottom: 16, right: 16 }}
-        onClick={() => {/* TODO: Open create appointment modal */}}
+        onClick={handleCreateAppointment}
       >
         <Add />
       </Fab>
+
+      {/* Modals */}
+      <AppointmentForm
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        onSubmit={handleFormSubmit}
+        appointment={selectedAppointment}
+        mode={formMode}
+      />
+
+      <AppointmentDetails
+        open={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
+        appointmentId={detailsAppointmentId}
+        onEdit={handleDetailsEdit}
+      />
+
+      <AppointmentDeleteConfirm
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+        appointment={appointmentToDelete}
+        loading={deleteLoading}
+      />
     </Container>
   );
 };

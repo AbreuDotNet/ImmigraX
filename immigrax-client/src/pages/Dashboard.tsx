@@ -24,6 +24,7 @@ import {
 import { DashboardData } from '../types';
 import apiService from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
+import ActivityLog from '../components/ActivityLog';
 
 // Mock data for development - replace with API call
 const mockData: DashboardData = {
@@ -316,6 +317,9 @@ const Dashboard: React.FC = () => {
             </Box>
           </Stack>
         </Paper>
+
+        {/* Activity Log */}
+        <ActivityLog maxItems={8} />
 
         {/* Alerts */}
         <Paper sx={{ p: 2 }}>
