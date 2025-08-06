@@ -21,12 +21,21 @@ namespace LegalApp.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ClientResponseDto>>> GetClients()
+        public async Task<ActionResult<IEnumerable<ClientResponseDto>>> GetClients([FromQuery] Guid? lawFirmId = null)
         {
             try
             {
-                var clients = await _context.Clients
+                var clientsQuery = _context.Clients
                     .Include(c => c.LawFirm)
+                    .AsQueryable();
+
+                // Filter by law firm if specified
+                if (lawFirmId.HasValue)
+                {
+                    clientsQuery = clientsQuery.Where(c => c.LawFirmId == lawFirmId.Value);
+                }
+
+                var clients = await clientsQuery
                     .Select(c => new ClientResponseDto
                     {
                         Id = c.Id,
@@ -40,6 +49,7 @@ namespace LegalApp.API.Controllers
                         CreatedAt = c.CreatedAt,
                         LawFirmName = c.LawFirm.Name
                     })
+                    .OrderByDescending(c => c.CreatedAt)
                     .ToListAsync();
 
                 return Ok(clients);
@@ -83,6 +93,62 @@ namespace LegalApp.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Error al obtener cliente", error = ex.Message });
+            }
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<ClientResponseDto>>> SearchClients([FromQuery] string query, [FromQuery] Guid? lawFirmId = null)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(query))
+                {
+                    return BadRequest(new { message = "El término de búsqueda es requerido" });
+                }
+
+                var clientsQuery = _context.Clients
+                    .Include(c => c.LawFirm)
+                    .AsQueryable();
+
+                // Filter by law firm if specified
+                if (lawFirmId.HasValue)
+                {
+                    clientsQuery = clientsQuery.Where(c => c.LawFirmId == lawFirmId.Value);
+                }
+
+                // Search in multiple fields
+                clientsQuery = clientsQuery.Where(c =>
+                    c.FullName.Contains(query) ||
+                    (c.Email != null && c.Email.Contains(query)) ||
+                    (c.Phone != null && c.Phone.Contains(query)) ||
+                    (c.CaseNumber != null && c.CaseNumber.Contains(query)) ||
+                    c.ProcessType.Contains(query) ||
+                    c.ProcessStatus.Contains(query)
+                );
+
+                var clients = await clientsQuery
+                    .Select(c => new ClientResponseDto
+                    {
+                        Id = c.Id,
+                        FullName = c.FullName,
+                        Email = c.Email,
+                        Phone = c.Phone,
+                        Address = c.Address,
+                        ProcessType = c.ProcessType,
+                        CaseNumber = c.CaseNumber,
+                        ProcessStatus = c.ProcessStatus,
+                        CreatedAt = c.CreatedAt,
+                        LawFirmName = c.LawFirm.Name
+                    })
+                    .OrderByDescending(c => c.CreatedAt)
+                    .Take(50) // Limit results
+                    .ToListAsync();
+
+                return Ok(clients);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error en la búsqueda", error = ex.Message });
             }
         }
 
