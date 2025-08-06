@@ -20,7 +20,12 @@ namespace LegalApp.API.Models
         FormCompleted = 13,
         CaseStatusUpdated = 14,
         PhoneCallMade = 15,
-        ClientInteraction = 16
+        ClientInteraction = 16,
+        UserCreate = 17,
+        UserUpdate = 18,
+        UserDelete = 19,
+        UserList = 20,
+        UserView = 21
     }
 
     public class ActivityLog

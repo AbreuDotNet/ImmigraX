@@ -5,7 +5,7 @@ import { Box,  Drawer,  AppBar,  Toolbar,  List,  Typography,  Divider,
         Avatar,  Menu,  MenuItem,  Chip, Paper, } from '@mui/material';
 import {
   Menu as MenuIcon,  Dashboard,  People,  Event,  Description,  Payment,
-  Note,  Search,  Logout,  AccountCircle,  Settings,  Gavel,  FlightTakeoff,  Assignment, Assessment, } from '@mui/icons-material';
+  Note,  Search,  Logout,  AccountCircle,  Settings,  Gavel,  FlightTakeoff,  Assignment, Assessment, ManageAccounts, Security, } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
 const drawerWidth = 240;
@@ -27,6 +27,8 @@ const menuItems: MenuItemType[] = [
   { text: 'Formularios', icon: <Assignment />, path: '/forms' },
   { text: 'Reportes', icon: <Assessment />, path: '/reports' },
   { text: 'Búsqueda', icon: <Search />, path: '/search' },
+  { text: 'Usuarios', icon: <ManageAccounts />, path: '/users', roles: ['Master'] },
+  { text: 'Roles', icon: <Security />, path: '/roles', roles: ['Master'] },
 ];
 
 const Layout: React.FC = () => {
@@ -126,6 +128,11 @@ const Layout: React.FC = () => {
       
       <List sx={{ px: 1 }}>
         {menuItems.map((item) => {
+          // Verificar si el usuario tiene permisos para ver este elemento del menú
+          if (item.roles && !item.roles.includes(user?.role || '')) {
+            return null;
+          }
+
           const isActive = location.pathname === item.path;
           return (
             <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
