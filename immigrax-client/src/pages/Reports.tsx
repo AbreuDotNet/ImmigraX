@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Container,
   Typography,
-  Grid,
   Card,
   CardContent,
   Box,
@@ -45,9 +44,9 @@ export default function Reports() {
         />
       </Box>
 
-      <Grid container spacing={4}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
         {/* Tipos de Reportes Disponibles */}
-        <Grid item xs={12} md={6}>
+        <Box sx={{ flex: '1 1 400px', minWidth: 400 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -93,10 +92,10 @@ export default function Reports() {
               </List>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
 
         {/* Características Técnicas */}
-        <Grid item xs={12} md={6}>
+        <Box sx={{ flex: '1 1 400px', minWidth: 400 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -149,8 +148,8 @@ export default function Reports() {
               </List>
             </CardContent>
           </Card>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* Nota técnica */}
       <Box sx={{ mt: 4, p: 3, bgcolor: 'grey.100', borderRadius: 2 }}>
