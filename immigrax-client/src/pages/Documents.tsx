@@ -533,7 +533,7 @@ const Documents: React.FC = () => {
                                     borderColor: 'divider',
                                     fontSize: '0.8rem',
                                     lineHeight: 1.3,
-                                    width: 'fit-content', // Ancho ajustado al contenido
+                                    width: 'fit-content',
                                     maxWidth: '100%'
                                   }}
                                 >
