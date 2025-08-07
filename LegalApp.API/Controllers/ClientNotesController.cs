@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using LegalApp.API.Data;
 using LegalApp.API.Models;
 using LegalApp.API.DTOs;
+using LegalApp.API.Services;
 using System.Security.Claims;
 
 namespace LegalApp.API.Controllers
@@ -14,10 +15,12 @@ namespace LegalApp.API.Controllers
     public class ClientNotesController : ControllerBase
     {
         private readonly LegalAppDbContext _context;
+        private readonly ActivityLogService _activityLogService;
 
-        public ClientNotesController(LegalAppDbContext context)
+        public ClientNotesController(LegalAppDbContext context, ActivityLogService activityLogService)
         {
             _context = context;
+            _activityLogService = activityLogService;
         }
 
         [HttpGet]
@@ -230,6 +233,24 @@ namespace LegalApp.API.Controllers
 
                 _context.ClientNotes.Add(note);
                 await _context.SaveChangesAsync();
+
+                // Get client info and user law firm for logging
+                var client = await _context.Clients.FindAsync(noteDto.ClientId);
+                var userLawFirm = await _context.UserLawFirms
+                    .Where(ul => ul.UserId == currentUserId)
+                    .FirstOrDefaultAsync();
+
+                // Log the activity
+                if (client != null && userLawFirm != null)
+                {
+                    await _activityLogService.LogNoteAddedAsync(
+                        currentUserId,
+                        userLawFirm.LawFirmId,
+                        noteDto.ClientId,
+                        client.FullName,
+                        noteDto.Title ?? "Nota sin título"
+                    );
+                }
 
                 // Return created note with related data
                 var createdNote = await _context.ClientNotes

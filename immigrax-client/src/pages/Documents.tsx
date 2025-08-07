@@ -314,17 +314,38 @@ const Documents: React.FC = () => {
 
   return (
     <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1">
-          Gestión de Documentos
-        </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        <Box>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: 'text.primary' }}>
+            📁 Gestión de Documentos
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+            Administra todos los documentos de tus clientes de forma organizada
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setOpenDialog(true)}
           size="large"
+          sx={{
+            borderRadius: 3,
+            px: 3,
+            py: 1.5,
+            textTransform: 'none',
+            fontSize: '1rem',
+            fontWeight: 600,
+            boxShadow: 3,
+            background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+            '&:hover': {
+              boxShadow: 6,
+              transform: 'translateY(-2px)',
+              background: 'linear-gradient(45deg, #1976D2 30%, #1CB5E0 90%)',
+            },
+            transition: 'all 0.3s ease'
+          }}
         >
-          Subir Documento
+          📤 Subir Documento
         </Button>
       </Box>
 
@@ -336,155 +357,443 @@ const Documents: React.FC = () => {
 
       <Box sx={{ mt: 3 }}>
         {Object.entries(groupDocumentsByClient()).map(([clientId, clientDocuments]) => (
-          <Accordion key={clientId} sx={{ mb: 2 }}>
-            <AccordionSummary 
-              expandIcon={<ExpandMoreIcon />}
-              sx={{ 
-                backgroundColor: 'primary.main',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'primary.dark',
-                },
-                '& .MuiAccordionSummary-expandIconWrapper': {
-                  color: 'white',
-                },
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <PersonIcon sx={{ mr: 2 }} />
-                <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                  {getClientName(clientId)}
-                </Typography>
-                <Badge 
-                  badgeContent={clientDocuments.length} 
-                  color="secondary"
-                  sx={{ mr: 2 }}
+          <Paper 
+            key={clientId} 
+            sx={{ 
+              mb: 2, // Margen inferior reducido
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: 'divider',
+              overflow: 'hidden',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                boxShadow: 4,
+                borderColor: 'primary.light',
+              }
+            }}
+          >
+            <Accordion sx={{ boxShadow: 'none' }}>
+              <AccordionSummary 
+                expandIcon={<ExpandMoreIcon />}
+                sx={{ 
+                  backgroundColor: 'grey.50',
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                  minHeight: 64, // Altura reducida del accordion header
+                  '&:hover': {
+                    backgroundColor: 'grey.100',
+                  },
+                  '& .MuiAccordionSummary-content': {
+                    margin: '12px 0', // Margen reducido
+                  },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', pr: 2 }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                    borderRadius: '50%',
+                    width: 40, // Tamaño reducido del avatar
+                    height: 40,
+                    mr: 2.5, // Margen reducido
+                    justifyContent: 'center'
+                  }}>
+                    <PersonIcon sx={{ fontSize: '1.2rem' }} />
+                  </Box>
+                  
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '1.1rem' }}>
+                      {getClientName(clientId)}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                      {clientDocuments.length} documento{clientDocuments.length !== 1 ? 's' : ''} subido{clientDocuments.length !== 1 ? 's' : ''}
+                    </Typography>
+                  </Box>
+                  
+                  <Chip 
+                    label={clientDocuments.length}
+                    color="primary"
+                    variant="filled"
+                    size="small"
+                    sx={{ 
+                      minWidth: 20, // Ancho mínimo reducido
+                      height: 20, // Altura reducida
+                      fontSize: '0.7rem', // Fuente más pequeña
+                      fontWeight: 'bold'
+                    }}
+                  />
+                </Box>
+              </AccordionSummary>
+              
+              {/* Botón agregar fuera del AccordionSummary */}
+              <Box sx={{ 
+                px: 3, 
+                py: 1, 
+                backgroundColor: 'grey.50', 
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+                display: 'flex',
+                justifyContent: 'flex-end'
+              }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<AddIcon sx={{ fontSize: '1rem' }} />}
+                  onClick={() => {
+                    setNewDocument(prev => ({ ...prev, clientId }));
+                    setOpenDialog(true);
+                  }}
+                  sx={{ 
+                    borderRadius: 1.5, // Border radius más pequeño
+                    textTransform: 'none',
+                    fontSize: '0.8rem', // Fuente más pequeña
+                    py: 0.5, // Padding vertical reducido
+                    px: 1.5, // Padding horizontal reducido
+                    '&:hover': {
+                      backgroundColor: 'primary.light',
+                      color: 'white',
+                      borderColor: 'primary.light',
+                    }
+                  }}
                 >
-                  <DocumentIcon />
-                </Badge>
+                  Agregar Documento
+                </Button>
               </Box>
-            </AccordionSummary>
-            
-            <AccordionDetails sx={{ p: 0 }}>
-              <List sx={{ width: '100%' }}>
-                {clientDocuments.map((document, index) => (
-                  <React.Fragment key={document.id}>
-                    <ListItem
-                      sx={{
-                        py: 2,
-                        '&:hover': {
-                          backgroundColor: 'action.hover',
-                        },
-                      }}
-                    >
-                      <ListItemIcon>
-                        {getFileIcon(document.fileType)}
-                      </ListItemIcon>
-                      
-                      <ListItemText
-                        primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="subtitle1" fontWeight="medium">
+              
+              <AccordionDetails sx={{ p: 0, backgroundColor: 'background.paper' }}>
+                <List sx={{ width: '100%' }}>
+                  {clientDocuments.map((document, index) => (
+                    <React.Fragment key={document.id}>
+                      <ListItem
+                        sx={{
+                          py: 2,
+                          px: 3,
+                          transition: 'background-color 0.2s ease',
+                          '&:hover': {
+                            backgroundColor: 'action.hover',
+                          },
+                          minHeight: 90, // Altura ajustada para el nuevo layout vertical
+                          alignItems: 'flex-start' // Alinear elementos al inicio
+                        }}
+                      >
+                        <ListItemIcon sx={{ minWidth: 56, alignSelf: 'flex-start', mt: 0.5 }}>
+                          <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: 40, // Tamaño reducido del icono
+                            height: 40,
+                            borderRadius: 2.5, // Border radius más pequeño
+                            color: 'primary.main',
+                            boxShadow: 1 // Sombra reducida
+                          }}>
+                            {getFileIcon(document.fileType)}
+                          </Box>
+                        </ListItemIcon>
+                        
+                        <ListItemText
+                          sx={{ pr: 0, flex: 1 }} // Sin padding derecho, flex normal
+                          primary={
+                            <Typography 
+                              variant="subtitle1" 
+                              sx={{ 
+                                fontWeight: 600,
+                                color: 'text.primary',
+                                fontSize: '1rem',
+                                mb: 0.5
+                              }}
+                            >
                               {document.originalFileName}
                             </Typography>
+                          }
+                          secondary={
+                            <Box component="div">
+                              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.85rem' }} component="div">
+                                📊 <strong>Tamaño:</strong> {formatFileSize(document.fileSize)} • 
+                                📅 <strong>Subido:</strong> {new Date(document.uploadedAt).toLocaleDateString('es-ES', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
+                              </Typography>
+                              {document.description && (
+                                <Typography 
+                                  variant="body2"
+                                  component="div"
+                                  sx={{ 
+                                    mt: 1,
+                                    p: 1.5,
+                                    backgroundColor: 'grey.50',
+                                    borderRadius: 1.5,
+                                    fontStyle: 'italic',
+                                    color: 'text.secondary',
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    fontSize: '0.8rem',
+                                    lineHeight: 1.3,
+                                    width: 'fit-content',
+                                    maxWidth: '100%'
+                                  }}
+                                >
+                                  💬 <strong>Descripción:</strong> {document.description}
+                                </Typography>
+                              )}
+                            </Box>
+                          }
+                        />
+                        
+                        <ListItemSecondaryAction>
+                          <Box sx={{ 
+                            display: 'flex', 
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 1
+                          }}>
+                            {/* Chip del tipo de documento centrado */}
                             <Chip 
                               label={document.documentType}
                               color={getDocumentTypeColor(document.documentType)}
                               size="small"
+                              variant="outlined"
+                              sx={{ 
+                                fontWeight: 600,
+                                fontSize: '0.75rem',
+                                height: 24,
+                                mb: 0.5
+                              }}
                             />
+                            
+                            {/* Botones de acción */}
+                            <Box sx={{ 
+                              display: 'flex', 
+                              gap: 0.5,
+                              alignItems: 'center'
+                            }}>
+                              <IconButton 
+                                size="small" 
+                                title="Visualizar documento"
+                                sx={{
+                                  backgroundColor: 'info.light',
+                                  color: 'white',
+                                  width: 32,
+                                  height: 32,
+                                  '&:hover': {
+                                    backgroundColor: 'info.main',
+                                    transform: 'scale(1.05)',
+                                  },
+                                  transition: 'all 0.2s ease'
+                                }}
+                              >
+                                <ViewIcon sx={{ fontSize: '1rem' }} />
+                              </IconButton>
+                              <IconButton 
+                                size="small" 
+                                title="Descargar documento"
+                                sx={{
+                                  backgroundColor: 'success.light',
+                                  color: 'white',
+                                  width: 32,
+                                  height: 32,
+                                  '&:hover': {
+                                    backgroundColor: 'success.main',
+                                    transform: 'scale(1.05)',
+                                  },
+                                  transition: 'all 0.2s ease'
+                                }}
+                              >
+                                <DownloadIcon sx={{ fontSize: '1rem' }} />
+                              </IconButton>
+                              <IconButton 
+                                size="small" 
+                                title="Eliminar documento"
+                                sx={{
+                                  backgroundColor: 'error.light',
+                                  color: 'white',
+                                  width: 32,
+                                  height: 32,
+                                  '&:hover': {
+                                    backgroundColor: 'error.main',
+                                    transform: 'scale(1.05)',
+                                  },
+                                  transition: 'all 0.2s ease'
+                                }}
+                              >
+                                <DeleteIcon sx={{ fontSize: '1rem' }} />
+                              </IconButton>
+                            </Box>
                           </Box>
-                        }
-                        secondary={
-                          <Box sx={{ mt: 1 }}>
-                            <Typography variant="body2" color="text.secondary">
-                              Tamaño: {formatFileSize(document.fileSize)} • 
-                              Subido: {new Date(document.uploadedAt).toLocaleDateString('es-ES')}
-                            </Typography>
-                            {document.description && (
-                              <Typography variant="body2" sx={{ mt: 0.5, fontStyle: 'italic' }}>
-                                {document.description}
-                              </Typography>
-                            )}
-                          </Box>
-                        }
-                      />
+                        </ListItemSecondaryAction>
+                      </ListItem>
                       
-                      <ListItemSecondaryAction>
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                          <IconButton 
-                            size="small" 
-                            color="primary"
-                            title="Visualizar documento"
-                          >
-                            <ViewIcon />
-                          </IconButton>
-                          <IconButton 
-                            size="small" 
-                            color="success"
-                            title="Descargar documento"
-                          >
-                            <DownloadIcon />
-                          </IconButton>
-                          <IconButton 
-                            size="small" 
-                            color="error"
-                            title="Eliminar documento"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                    
-                    {index < clientDocuments.length - 1 && <Divider />}
-                  </React.Fragment>
-                ))}
-              </List>
-            </AccordionDetails>
-          </Accordion>
+                      {index < clientDocuments.length - 1 && (
+                        <Divider 
+                          sx={{ 
+                            mx: 2, // Margen horizontal reducido
+                            my: 0.5, // Margen vertical reducido
+                            borderColor: 'divider',
+                            '&::before, &::after': {
+                              borderColor: 'primary.light',
+                            }
+                          }} 
+                          variant="middle"
+                        />
+                      )}
+                    </React.Fragment>
+                  ))}
+                  
+                  {/* Mensaje de estado vacío para cada cliente */}
+                  {clientDocuments.length === 0 && (
+                    <Box sx={{ p: 4, textAlign: 'center' }}>
+                      <DocumentIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
+                      <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                        No hay documentos para este cliente
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={() => {
+                          setNewDocument(prev => ({ ...prev, clientId }));
+                          setOpenDialog(true);
+                        }}
+                        sx={{ borderRadius: 2 }}
+                      >
+                        Subir Primer Documento
+                      </Button>
+                    </Box>
+                  )}
+                </List>
+              </AccordionDetails>
+            </Accordion>
+          </Paper>
         ))}
       </Box>
 
       {documents.length === 0 && (
-        <Paper sx={{ p: 4, textAlign: 'center', mt: 3 }}>
-          <DocumentIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-          <Typography variant="h6" color="text.secondary">
-            No hay documentos disponibles
-          </Typography>
-          <Typography color="text.secondary">
-            Sube tu primer documento para comenzar
-          </Typography>
+        <Paper 
+          sx={{ 
+            p: 6, 
+            textAlign: 'center', 
+            mt: 4,
+            borderRadius: 3,
+            border: '2px dashed',
+            borderColor: 'divider',
+            backgroundColor: 'grey.50'
+          }}
+        >
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2
+          }}>
+            <Box sx={{
+              backgroundColor: 'primary.light',
+              borderRadius: '50%',
+              p: 3,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <DocumentIcon sx={{ fontSize: 64, color: 'white' }} />
+            </Box>
+            <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
+              📂 No hay documentos disponibles
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
+              Comienza subiendo el primer documento para organizar los archivos de tus clientes de manera profesional
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenDialog(true)}
+              sx={{
+                mt: 2,
+                px: 4,
+                py: 1.5,
+                borderRadius: 3,
+                textTransform: 'none',
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                background: 'linear-gradient(45deg, #4CAF50 30%, #66BB6A 90%)',
+                '&:hover': {
+                  background: 'linear-gradient(45deg, #388E3C 30%, #4CAF50 90%)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: 6,
+                },
+                transition: 'all 0.3s ease'
+              }}
+            >
+              🚀 Subir Primer Documento
+            </Button>
+          </Box>
         </Paper>
       )}
 
       {/* Dialog para subir documento */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Subir Nuevo Documento</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+      <Dialog 
+        open={openDialog} 
+        onClose={() => setOpenDialog(false)} 
+        maxWidth="md" 
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            borderRadius: 3,
+            boxShadow: 24,
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          backgroundColor: 'primary.main', 
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          fontSize: '1.25rem',
+          fontWeight: 600
+        }}>
+          <UploadIcon />
+          📤 Subir Nuevo Documento
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
             <FormControl fullWidth>
-              <InputLabel>Cliente</InputLabel>
+              <InputLabel id="client-select-label" sx={{ fontWeight: 500 }}>👤 Cliente</InputLabel>
               <Select
+                labelId="client-select-label"
+                label="👤 Cliente"
                 value={newDocument.clientId}
                 onChange={(e) => setNewDocument(prev => ({...prev, clientId: e.target.value}))}
+                sx={{ borderRadius: 2 }}
               >
                 {clients.map((client) => (
                   <MenuItem key={client.id} value={client.id}>
-                    {client.fullName}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <PersonIcon color="primary" />
+                      {client.fullName}
+                    </Box>
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
             
             <FormControl fullWidth>
-              <InputLabel>Tipo de Documento</InputLabel>
+              <InputLabel id="document-type-select-label" sx={{ fontWeight: 500 }}>📋 Tipo de Documento</InputLabel>
               <Select
+                labelId="document-type-select-label"
+                label="📋 Tipo de Documento"
                 value={newDocument.documentType}
                 onChange={(e) => setNewDocument(prev => ({...prev, documentType: e.target.value}))}
+                sx={{ borderRadius: 2 }}
               >
                 {documentTypes.map((type) => (
                   <MenuItem key={type} value={type}>
-                    {type}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <DocumentIcon color="primary" />
+                      {type}
+                    </Box>
                   </MenuItem>
                 ))}
               </Select>
@@ -492,19 +801,39 @@ const Documents: React.FC = () => {
             
             <TextField
               fullWidth
-              label="Descripción (opcional)"
+              label="💬 Descripción (opcional)"
               multiline
               rows={3}
               value={newDocument.description}
               onChange={(e) => setNewDocument(prev => ({...prev, description: e.target.value}))}
+              sx={{ 
+                '& .MuiOutlinedInput-root': { 
+                  borderRadius: 2 
+                },
+                '& .MuiInputLabel-root': {
+                  fontWeight: 500
+                }
+              }}
+              placeholder="Agrega una descripción detallada del documento..."
             />
             
-            <Box
-              border="2px dashed #ccc"
-              borderRadius={2}
-              p={3}
-              textAlign="center"
-              sx={{ cursor: 'pointer', '&:hover': { backgroundColor: 'action.hover' } }}
+            <Paper
+              elevation={0}
+              sx={{
+                border: '3px dashed',
+                borderColor: selectedFile ? 'success.main' : 'primary.light',
+                borderRadius: 3,
+                p: 4,
+                textAlign: 'center',
+                cursor: 'pointer',
+                backgroundColor: selectedFile ? 'success.50' : 'primary.50',
+                transition: 'all 0.3s ease',
+                '&:hover': { 
+                  borderColor: selectedFile ? 'success.dark' : 'primary.main',
+                  backgroundColor: selectedFile ? 'success.100' : 'primary.100',
+                  transform: 'scale(1.02)'
+                }
+              }}
               onClick={() => document.getElementById('file-input')?.click()}
             >
               <input
@@ -514,24 +843,72 @@ const Documents: React.FC = () => {
                 onChange={handleFileSelect}
                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
               />
-              <UploadIcon sx={{ fontSize: 48, color: 'text.secondary' }} />
-              <Typography variant="h6" color="text.secondary">
-                {selectedFile ? selectedFile.name : 'Selecciona un archivo'}
-              </Typography>
-              <Typography color="text.secondary">
-                Formatos soportados: PDF, DOC, DOCX, JPG, PNG
-              </Typography>
-            </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                <Box sx={{
+                  backgroundColor: selectedFile ? 'success.main' : 'primary.main',
+                  borderRadius: '50%',
+                  p: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <UploadIcon sx={{ fontSize: 48, color: 'white' }} />
+                </Box>
+                <Typography variant="h6" sx={{ 
+                  fontWeight: 600,
+                  color: selectedFile ? 'success.dark' : 'primary.dark'
+                }}>
+                  {selectedFile ? `✅ ${selectedFile.name}` : '📎 Selecciona un archivo'}
+                </Typography>
+                <Typography color="text.secondary" sx={{ fontSize: '0.9rem' }}>
+                  📄 Formatos soportados: PDF, DOC, DOCX, JPG, PNG
+                </Typography>
+                {selectedFile && (
+                  <Chip
+                    label={`📊 Tamaño: ${(selectedFile.size / 1024 / 1024).toFixed(2)} MB`}
+                    color="success"
+                    variant="outlined"
+                    sx={{ mt: 1 }}
+                  />
+                )}
+              </Box>
+            </Paper>
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
+        <DialogActions sx={{ p: 3, gap: 2 }}>
+          <Button 
+            onClick={() => setOpenDialog(false)}
+            variant="outlined"
+            sx={{ 
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 500,
+              px: 3
+            }}
+          >
+            ❌ Cancelar
+          </Button>
           <Button 
             onClick={handleUpload} 
             variant="contained"
             disabled={!selectedFile || !newDocument.clientId || !newDocument.documentType}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 4,
+              background: 'linear-gradient(45deg, #4CAF50 30%, #66BB6A 90%)',
+              '&:hover': {
+                background: 'linear-gradient(45deg, #388E3C 30%, #4CAF50 90%)',
+                boxShadow: 6,
+              },
+              '&:disabled': {
+                background: 'grey.300',
+                color: '#ffffff'
+              }
+            }}
           >
-            Subir Documento
+            🚀 Subir Documento
           </Button>
         </DialogActions>
       </Dialog>
