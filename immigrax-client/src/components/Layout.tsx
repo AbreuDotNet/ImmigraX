@@ -5,7 +5,7 @@ import { Box,  Drawer,  AppBar,  Toolbar,  List,  Typography,  Divider,
         Avatar,  Menu,  MenuItem,  Chip, Paper, } from '@mui/material';
 import {
   Menu as MenuIcon,  Dashboard,  People,  Event,  Description,  Payment,
-  Note,  Search,  Logout,  AccountCircle,  Settings,  Gavel,  FlightTakeoff,  Assignment, Assessment, ManageAccounts, Security, } from '@mui/icons-material';
+  Note,  Search,  Logout,  AccountCircle,  Settings,  Assignment, Assessment, ManageAccounts, Security, } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
 const drawerWidth = 240;
@@ -97,16 +97,19 @@ const Layout: React.FC = () => {
             borderRadius: 2,
             p: 1,
             transition: 'all 0.2s ease-in-out',
+            justifyContent: 'center',
           }}
           onClick={() => handleNavigation('/dashboard')}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
-            <Gavel sx={{ color: 'primary.main', mr: 0.5, fontSize: 20 }} />
-            <FlightTakeoff sx={{ color: 'primary.main', fontSize: 18 }} />
-          </Box>
-          <Typography variant="h6" noWrap component="div" color="primary" fontWeight="bold">
-            ImmigraX
-          </Typography>
+          <img 
+            src="/immigrax-logo.png" 
+            alt="ImmigraX" 
+            style={{ 
+              height: '50px',
+              maxWidth: '100%',
+              objectFit: 'contain'
+            }} 
+          />
         </Box>
       </Toolbar>
       
@@ -235,15 +238,39 @@ const Layout: React.FC = () => {
             }}
             onClick={() => handleNavigation('/dashboard')}
           >
-            <Gavel sx={{ color: 'white', mr: 0.5, fontSize: 20 }} />
-            <FlightTakeoff sx={{ color: 'white', fontSize: 18, mr: 1 }} />
-            <Typography variant="h6" noWrap component="div" color="white" fontWeight="bold">
-              ImmigraX
-            </Typography>
+            <img 
+              src="/immigrax-logo.png" 
+              alt="ImmigraX" 
+              style={{ 
+                height: '32px',
+                objectFit: 'contain',
+                filter: 'brightness(0) invert(1)'
+              }} 
+            />
           </Box>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
-            Sistema de Gestión Legal
-          </Typography>
+          <Box sx={{ 
+            flexGrow: 1, 
+            display: { xs: 'none', sm: 'flex' }, 
+            alignItems: 'center',
+            cursor: 'pointer',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            },
+            borderRadius: 1,
+            p: 0.5
+          }}
+          onClick={() => handleNavigation('/dashboard')}
+          >
+            <img 
+              src="/immigrax-logo.png" 
+              alt="ImmigraX" 
+              style={{ 
+                height: '40px',
+                objectFit: 'contain',
+                filter: 'brightness(0) invert(1)' // Para hacer el logo blanco en la barra azul
+              }} 
+            />
+          </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Chip
               label={user?.role}

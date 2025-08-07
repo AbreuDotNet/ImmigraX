@@ -67,6 +67,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<ActivityLogService>();
+builder.Services.AddScoped<UserMigrationService>();
 
 // Add controllers
 builder.Services.AddControllers();

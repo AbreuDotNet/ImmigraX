@@ -2,8 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using LegalApp.API.Data;
 using LegalApp.API.Models;
 using LegalApp.API.DTOs;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace LegalApp.API.Services
 {
@@ -31,6 +29,14 @@ namespace LegalApp.API.Services
             var user = await GetUserByEmailAsync(loginRequest.Email);
             if (user == null || !user.IsActive)
                 return null;
+
+            // Verificar que el usuario esté asociado a al menos un bufete legal
+            if (user.UserLawFirms == null || !user.UserLawFirms.Any())
+            {
+                // Si es un usuario Master, puede que no tenga asociaciones aún, verificar por rol
+                if (user.Role != UserRole.Master)
+                    return null;
+            }
 
             if (!VerifyPassword(loginRequest.Password, user.PasswordHash))
                 return null;
@@ -79,6 +85,8 @@ namespace LegalApp.API.Services
         public async Task<User?> GetUserByEmailAsync(string email)
         {
             return await _context.Users
+                .Include(u => u.UserLawFirms)
+                .ThenInclude(ulf => ulf.LawFirm)
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
         }
 
@@ -93,15 +101,12 @@ namespace LegalApp.API.Services
 
         private string HashPassword(string password)
         {
-            using var sha256 = SHA256.Create();
-            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password + "LegalApp_Salt"));
-            return Convert.ToBase64String(hashedBytes);
+            return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
         private bool VerifyPassword(string password, string hash)
         {
-            var computedHash = HashPassword(password);
-            return computedHash == hash;
+            return BCrypt.Net.BCrypt.Verify(password, hash);
         }
     }
 }

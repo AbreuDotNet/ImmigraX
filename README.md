@@ -222,8 +222,8 @@ The system comes with pre-configured demo accounts for testing:
 
 | Role | Email | Password | Access Level |
 |------|-------|----------|-------------|
-| 👑 **Master** | `dabreu@synerxrd.com` | `Master123!` | Full system access |
-| ⚖️ **Lawyer** | `maria.gonzalez@immigrax.com` | `Abogado123!` | Case & client management |
+| 👑 **Master** | `dabreu@synerxrd.com` | `nuevaPassword123` | Full system access |
+| ⚖️ **Lawyer** | `maria.gonzalez@immigrax.com` | `nuevaPassword123` | Case & client management |
 | 📋 **Secretary** | `ana@immigrax.com` | `Secretario123!` | Limited administrative access |
 
 ## 🎯 Core Features

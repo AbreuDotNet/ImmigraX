@@ -42,7 +42,7 @@ const Login: React.FC = () => {
 
   const handleTestLogin = () => {
     setEmail('dabreu@synerxrd.com');
-    setPassword('Master123!');
+    setPassword('nuevaPassword123');
   };
 
   return (
@@ -59,9 +59,16 @@ const Login: React.FC = () => {
         <Card sx={{ width: '100%', maxWidth: 400 }}>
           <CardContent sx={{ p: 4 }}>
             <Box sx={{ textAlign: 'center', mb: 3 }}>
-              <Typography variant="h4" component="h1" gutterBottom color="primary">
-                ImmigraX
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                <img 
+                  src="/immigrax-logo.png" 
+                  alt="ImmigraX" 
+                  style={{ 
+                    height: '80px',
+                    objectFit: 'contain'
+                  }} 
+                />
+              </Box>
               <Typography variant="h6" color="text.secondary">
                 Sistema de Gestión Legal
               </Typography>
@@ -147,7 +154,7 @@ const Login: React.FC = () => {
                   Usuario Master: dabreu@synerxrd.com
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Contraseña: Master123!
+                  Contraseña: nuevaPassword123
                 </Typography>
               </Box>
             </Box>

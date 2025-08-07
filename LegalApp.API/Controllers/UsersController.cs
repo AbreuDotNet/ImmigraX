@@ -129,6 +129,11 @@ namespace LegalApp.API.Controllers
             }
 
             var lawFirmId = await GetCurrentUserLawFirmIdAsync(userId);
+            
+            if (lawFirmId == Guid.Empty)
+            {
+                return BadRequest("Usuario actual no está asociado a ningún bufete legal");
+            }
 
             // Verificar si el email ya existe
             var existingUser = await _context.Users
@@ -157,6 +162,16 @@ namespace LegalApp.API.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
+            // Asociar el nuevo usuario al mismo bufete legal del usuario que lo crea
+            var userLawFirm = new UserLawFirm
+            {
+                UserId = user.Id,
+                LawFirmId = lawFirmId
+            };
+
+            _context.Set<UserLawFirm>().Add(userLawFirm);
+            await _context.SaveChangesAsync();
+
             var userDto = new UserDto
             {
                 Id = user.Id,
@@ -172,7 +187,7 @@ namespace LegalApp.API.Controllers
                 userId, 
                 lawFirmId, 
                 ActivityType.UserCreate, 
-                $"Usuario {user.FullName} creado"
+                $"Usuario {user.FullName} creado y asociado al bufete"
             );
 
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, userDto);

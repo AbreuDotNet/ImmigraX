@@ -172,9 +172,33 @@ const Dashboard: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Dashboard
-      </Typography>
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        mb: 4,
+        p: 3,
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        borderRadius: 2,
+        color: 'white'
+      }}>
+        <img 
+          src="/immigrax-logo.png" 
+          alt="ImmigraX" 
+          style={{ 
+            height: '80px',
+            objectFit: 'contain',
+            filter: 'brightness(0) invert(1)' // Hace el logo blanco
+          }} 
+        />
+        <Box>
+          <Typography variant="h4" gutterBottom sx={{ mb: 1, color: 'white' }}>
+            Dashboard Ejecutivo
+          </Typography>
+          <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+            Sistema de Gestión Legal ImmigraX
+          </Typography>
+        </Box>
+      </Box>
 
       {/* Summary Cards */}
       <Box 

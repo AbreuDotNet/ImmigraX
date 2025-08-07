@@ -50,7 +50,7 @@ namespace LegalApp.API.Seeders
                         Id = Guid.NewGuid(),
                         FullName = "Daniel Abreu",
                         Email = "dabreu@synerxrd.com",
-                        PasswordHash = HashPassword("Master123!"),
+                        PasswordHash = HashPassword("nuevaPassword123"),
                         Role = UserRole.Master,
                         IsActive = true,
                         CreatedAt = DateTime.UtcNow
