@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using LegalApp.API.Data;
 using LegalApp.API.Models;
 using LegalApp.API.DTOs;
+using LegalApp.API.Services;
 using System.Security.Claims;
 
 namespace LegalApp.API.Controllers
@@ -14,10 +15,12 @@ namespace LegalApp.API.Controllers
     public class AppointmentsController : ControllerBase
     {
         private readonly LegalAppDbContext _context;
+        private readonly ActivityLogService _activityLogService;
 
-        public AppointmentsController(LegalAppDbContext context)
+        public AppointmentsController(LegalAppDbContext context, ActivityLogService activityLogService)
         {
             _context = context;
+            _activityLogService = activityLogService;
         }
 
         [HttpGet]
@@ -109,24 +112,27 @@ namespace LegalApp.API.Controllers
                     return Unauthorized(new { message = "Token de usuario inválido" });
                 }
 
-                // Verify client and law firm exist
-                var clientExists = await _context.Clients.AnyAsync(c => c.Id == appointmentDto.ClientId);
-                var lawFirmExists = await _context.LawFirms.AnyAsync(lf => lf.Id == appointmentDto.LawFirmId);
+                // Get user's law firm instead of using appointmentDto.LawFirmId
+                var userLawFirm = await _context.UserLawFirms
+                    .Where(ul => ul.UserId == currentUserId)
+                    .FirstOrDefaultAsync();
 
+                if (userLawFirm == null)
+                {
+                    return BadRequest(new { message = "Usuario no está asociado a ninguna firma legal" });
+                }
+
+                // Verify client exists
+                var clientExists = await _context.Clients.AnyAsync(c => c.Id == appointmentDto.ClientId);
                 if (!clientExists)
                 {
                     return BadRequest(new { message = "El cliente especificado no existe" });
                 }
 
-                if (!lawFirmExists)
-                {
-                    return BadRequest(new { message = "La firma legal especificada no existe" });
-                }
-
                 var appointment = new Appointment
                 {
                     ClientId = appointmentDto.ClientId,
-                    LawFirmId = appointmentDto.LawFirmId,
+                    LawFirmId = userLawFirm.LawFirmId, // Use authenticated user's LawFirm
                     Title = appointmentDto.Title,
                     Description = appointmentDto.Description,
                     AppointmentType = appointmentDto.AppointmentType,
@@ -138,6 +144,17 @@ namespace LegalApp.API.Controllers
 
                 _context.Appointments.Add(appointment);
                 await _context.SaveChangesAsync();
+
+                // Get client name for logging
+                var client = await _context.Clients.FindAsync(appointmentDto.ClientId);
+                
+                // Log the activity
+                await _activityLogService.LogAppointmentScheduledAsync(
+                    currentUserId, 
+                    userLawFirm.LawFirmId, // Use authenticated user's LawFirm
+                    appointmentDto.ClientId, 
+                    client?.FullName ?? "Cliente desconocido",
+                    appointmentDto.AppointmentDate);
 
                 // Return created appointment with related data
                 var createdAppointment = await _context.Appointments
@@ -175,11 +192,35 @@ namespace LegalApp.API.Controllers
         {
             try
             {
-                var appointment = await _context.Appointments.FindAsync(id);
+                // Get current user ID from JWT token
+                var currentUserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(currentUserIdString, out var currentUserId))
+                {
+                    return Unauthorized(new { message = "Token de usuario inválido" });
+                }
+
+                // Get user's law firm
+                var userLawFirm = await _context.UserLawFirms
+                    .Where(ul => ul.UserId == currentUserId)
+                    .FirstOrDefaultAsync();
+
+                if (userLawFirm == null)
+                {
+                    return BadRequest(new { message = "Usuario no está asociado a ninguna firma legal" });
+                }
+
+                var appointment = await _context.Appointments
+                    .Include(a => a.Client)
+                    .FirstOrDefaultAsync(a => a.Id == id);
+                    
                 if (appointment == null)
                 {
                     return NotFound(new { message = "Cita no encontrada" });
                 }
+
+                // Store original values for comparison
+                var originalTitle = appointment.Title;
+                var originalDate = appointment.AppointmentDate;
 
                 // Update only provided fields
                 if (!string.IsNullOrEmpty(appointmentDto.Title))
@@ -199,6 +240,24 @@ namespace LegalApp.API.Controllers
 
                 await _context.SaveChangesAsync();
 
+                // Log the activity
+                var changes = new List<string>();
+                if (!string.IsNullOrEmpty(appointmentDto.Title) && appointmentDto.Title != originalTitle)
+                    changes.Add($"Título: '{originalTitle}' → '{appointmentDto.Title}'");
+                if (appointmentDto.AppointmentDate.HasValue && appointmentDto.AppointmentDate != originalDate)
+                    changes.Add($"Fecha: '{originalDate:dd/MM/yyyy HH:mm}' → '{appointmentDto.AppointmentDate:dd/MM/yyyy HH:mm}'");
+
+                if (changes.Any())
+                {
+                    await _activityLogService.LogAppointmentUpdatedAsync(
+                        currentUserId,
+                        userLawFirm.LawFirmId,
+                        appointment.ClientId,
+                        appointment.Client?.FullName ?? "Cliente desconocido",
+                        appointment.Title,
+                        string.Join(", ", changes));
+                }
+
                 return Ok(new { message = "Cita actualizada exitosamente" });
             }
             catch (Exception ex)
@@ -212,8 +271,26 @@ namespace LegalApp.API.Controllers
         {
             try
             {
+                // Get current user ID from JWT token
+                var currentUserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(currentUserIdString, out var currentUserId))
+                {
+                    return Unauthorized(new { message = "Token de usuario inválido" });
+                }
+
+                // Get user's law firm
+                var userLawFirm = await _context.UserLawFirms
+                    .Where(ul => ul.UserId == currentUserId)
+                    .FirstOrDefaultAsync();
+
+                if (userLawFirm == null)
+                {
+                    return BadRequest(new { message = "Usuario no está asociado a ninguna firma legal" });
+                }
+
                 var appointment = await _context.Appointments
                     .Include(a => a.Confirmation)
+                    .Include(a => a.Client)
                     .FirstOrDefaultAsync(a => a.Id == id);
 
                 if (appointment == null)
@@ -239,6 +316,18 @@ namespace LegalApp.API.Controllers
 
                 await _context.SaveChangesAsync();
 
+                // Log the activity
+                var activityMessage = confirmed ? 
+                    $"Cita '{appointment.Title}' confirmada por el cliente" : 
+                    $"Cita '{appointment.Title}' cancelada por el cliente";
+
+                await _activityLogService.LogClientInteractionAsync(
+                    currentUserId,
+                    userLawFirm.LawFirmId,
+                    appointment.ClientId,
+                    appointment.Client?.FullName ?? "Cliente desconocido",
+                    activityMessage);
+
                 return Ok(new { message = confirmed ? "Cita confirmada exitosamente" : "Cita cancelada por el cliente" });
             }
             catch (Exception ex)
@@ -252,14 +341,49 @@ namespace LegalApp.API.Controllers
         {
             try
             {
-                var appointment = await _context.Appointments.FindAsync(id);
+                // Get current user ID from JWT token
+                var currentUserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(currentUserIdString, out var currentUserId))
+                {
+                    return Unauthorized(new { message = "Token de usuario inválido" });
+                }
+
+                // Get user's law firm
+                var userLawFirm = await _context.UserLawFirms
+                    .Where(ul => ul.UserId == currentUserId)
+                    .FirstOrDefaultAsync();
+
+                if (userLawFirm == null)
+                {
+                    return BadRequest(new { message = "Usuario no está asociado a ninguna firma legal" });
+                }
+
+                var appointment = await _context.Appointments
+                    .Include(a => a.Client)
+                    .FirstOrDefaultAsync(a => a.Id == id);
+                    
                 if (appointment == null)
                 {
                     return NotFound(new { message = "Cita no encontrada" });
                 }
 
+                // Store data for logging before deletion
+                var appointmentTitle = appointment.Title;
+                var clientName = appointment.Client?.FullName ?? "Cliente desconocido";
+                var clientId = appointment.ClientId;
+                var appointmentDate = appointment.AppointmentDate;
+
                 _context.Appointments.Remove(appointment);
                 await _context.SaveChangesAsync();
+
+                // Log the activity
+                await _activityLogService.LogAppointmentCancelledAsync(
+                    currentUserId,
+                    userLawFirm.LawFirmId,
+                    clientId,
+                    clientName,
+                    appointmentTitle,
+                    appointmentDate);
 
                 return Ok(new { message = "Cita eliminada exitosamente" });
             }

@@ -13,6 +13,7 @@ import {
   CircularProgress,
   Container,
   Stack,
+  Snackbar,
 } from '@mui/material';
 import {
   People,
@@ -22,8 +23,8 @@ import {
 } from '@mui/icons-material';
 import { DashboardData } from '../types';
 import apiService from '../services/apiService';
-import ApiStatus from '../components/ApiStatus';
 import { useAuth } from '../context/AuthContext';
+import ActivityLog from '../components/ActivityLog';
 
 // Mock data for development - replace with API call
 const mockData: DashboardData = {
@@ -79,6 +80,15 @@ const Dashboard: React.FC = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [apiNotification, setApiNotification] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error' | 'warning' | 'info';
+  }>({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -94,15 +104,30 @@ const Dashboard: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        console.log('Attempting to fetch dashboard data from API...');
+       // console.log('Attempting to fetch dashboard data from API...');
         
         // Try to fetch real dashboard data
         const response = await apiService.getDashboardData();
-        console.log('Dashboard data fetched successfully:', response);
+        // console.log('Dashboard data fetched successfully:', response);
         setData(response);
+        
+        // Show success notification
+        setApiNotification({
+          open: true,
+          message: '✅ API conectada correctamente. Datos actualizados.',
+          severity: 'success'
+        });
       } catch (err) {
         console.warn('Dashboard API failed, using mock data:', err);
         setError('Dashboard API temporalmente no disponible');
+        
+        // Show error notification
+        setApiNotification({
+          open: true,
+          message: '⚠️ API no disponible. Usando datos de prueba.',
+          severity: 'warning'
+        });
+        
         // Fallback to mock data if API fails
         await new Promise(resolve => setTimeout(resolve, 500));
         setData(mockData);
@@ -113,6 +138,13 @@ const Dashboard: React.FC = () => {
 
     fetchDashboardData();
   }, [isAuthenticated]);
+
+  const handleCloseNotification = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setApiNotification(prev => ({ ...prev, open: false }));
+  };
 
   if (loading) {
     return (
@@ -140,11 +172,24 @@ const Dashboard: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Dashboard
-      </Typography>
-
-      <ApiStatus showDetails={true} />
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        mb: 4,
+        p: 3,
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        borderRadius: 2,
+        color: 'white'
+      }}>
+        <Box>
+          <Typography variant="h4" gutterBottom sx={{ mb: 1, color: 'white' }}>
+            Dashboard Ejecutivo
+          </Typography>
+          <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+            Sistema de Gestión Legal SynerVisa
+          </Typography>
+        </Box>
+      </Box>
 
       {/* Summary Cards */}
       <Box 
@@ -288,6 +333,9 @@ const Dashboard: React.FC = () => {
           </Stack>
         </Paper>
 
+        {/* Activity Log */}
+        <ActivityLog maxItems={8} />
+
         {/* Alerts */}
         <Paper sx={{ p: 2 }}>
           <Typography variant="h6" gutterBottom>
@@ -317,6 +365,26 @@ const Dashboard: React.FC = () => {
       <Alert severity="info" sx={{ mt: 3 }}>
         Dashboard configurado correctamente. Los datos se actualizan automáticamente.
       </Alert>
+
+      {/* Notification Snackbar */}
+      <Snackbar
+        open={apiNotification.open}
+        autoHideDuration={3000}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleCloseNotification} 
+          severity={apiNotification.severity}
+          sx={{ 
+            width: '100%',
+            boxShadow: 4,
+            borderRadius: 2
+          }}
+        >
+          {apiNotification.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

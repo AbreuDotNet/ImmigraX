@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using LegalApp.API.Data;
 using LegalApp.API.Models;
 using LegalApp.API.DTOs;
+using LegalApp.API.Services;
 using System.Security.Claims;
 
 namespace LegalApp.API.Controllers
@@ -15,11 +16,13 @@ namespace LegalApp.API.Controllers
     {
         private readonly LegalAppDbContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly ActivityLogService _activityLogService;
 
-        public DocumentsController(LegalAppDbContext context, IWebHostEnvironment environment)
+        public DocumentsController(LegalAppDbContext context, IWebHostEnvironment environment, ActivityLogService activityLogService)
         {
             _context = context;
             _environment = environment;
+            _activityLogService = activityLogService;
         }
 
         [HttpGet]
@@ -180,6 +183,24 @@ namespace LegalApp.API.Controllers
 
                 _context.ClientDocuments.Add(document);
                 await _context.SaveChangesAsync();
+
+                // Get client info for logging
+                var client = await _context.Clients.FindAsync(documentDto.ClientId);
+                var userLawFirm = await _context.UserLawFirms
+                    .Where(ul => ul.UserId == currentUserId)
+                    .FirstOrDefaultAsync();
+
+                // Log the activity
+                if (client != null && userLawFirm != null)
+                {
+                    await _activityLogService.LogDocumentUploadedAsync(
+                        currentUserId,
+                        userLawFirm.LawFirmId,
+                        documentDto.ClientId,
+                        client.FullName,
+                        documentDto.DocumentType
+                    );
+                }
 
                 // Return created document with related data
                 var createdDocument = await _context.ClientDocuments

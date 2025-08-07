@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using LegalApp.API.Data;
 using LegalApp.API.Models;
 using LegalApp.API.DTOs;
+using LegalApp.API.Services;
 using System.Security.Claims;
 
 namespace LegalApp.API.Controllers
@@ -14,10 +15,12 @@ namespace LegalApp.API.Controllers
     public class PaymentsController : ControllerBase
     {
         private readonly LegalAppDbContext _context;
+        private readonly ActivityLogService _activityLogService;
 
-        public PaymentsController(LegalAppDbContext context)
+        public PaymentsController(LegalAppDbContext context, ActivityLogService activityLogService)
         {
             _context = context;
+            _activityLogService = activityLogService;
         }
 
         [HttpGet]
@@ -228,6 +231,15 @@ namespace LegalApp.API.Controllers
 
                 _context.Payments.Add(payment);
                 await _context.SaveChangesAsync();
+
+                // Log the activity
+                await _activityLogService.LogPaymentReceivedAsync(
+                    currentUserId,
+                    lawFirmId,
+                    paymentDto.ClientId,
+                    client.FullName,
+                    paymentDto.Amount
+                );
 
                 // Return created payment with related data
                 var createdPayment = await _context.Payments

@@ -71,12 +71,21 @@ export interface Appointment {
   title?: string;
   description?: string;
   appointmentType?: string;
-  priority?: Priority;
+  priority?: Priority | number; // Can be enum or numeric
   status: AppointmentStatus;
   appointmentDate: string;
   createdBy: string;
   createdAt: string;
   client?: Client;
+  clientName?: string; // For display purposes
+  duration?: number; // Duration in minutes
+}
+
+// Extended type for calendar and list view
+export interface AppointmentWithClient extends Appointment {
+  clientName: string;
+  start?: Date;
+  end?: Date;
 }
 
 export enum Priority {
@@ -317,4 +326,45 @@ export interface PaginatedResponse<T> {
   pageSize: number;
   totalCount: number;
   totalPages: number;
+}
+
+// Activity Log Types
+export enum ActivityType {
+  CLIENT_CREATED = 'CLIENT_CREATED',
+  CLIENT_UPDATED = 'CLIENT_UPDATED',
+  APPOINTMENT_SCHEDULED = 'APPOINTMENT_SCHEDULED',
+  APPOINTMENT_CONFIRMED = 'APPOINTMENT_CONFIRMED',
+  APPOINTMENT_CANCELLED = 'APPOINTMENT_CANCELLED',
+  EMAIL_SENT = 'EMAIL_SENT',
+  DOCUMENT_UPLOADED = 'DOCUMENT_UPLOADED',
+  DOCUMENT_REVIEWED = 'DOCUMENT_REVIEWED',
+  PAYMENT_RECEIVED = 'PAYMENT_RECEIVED',
+  PAYMENT_REMINDER_SENT = 'PAYMENT_REMINDER_SENT',
+  NOTE_ADDED = 'NOTE_ADDED',
+  FORM_SENT = 'FORM_SENT',
+  FORM_COMPLETED = 'FORM_COMPLETED',
+  CASE_STATUS_UPDATED = 'CASE_STATUS_UPDATED',
+  PHONE_CALL_MADE = 'PHONE_CALL_MADE'
+}
+
+export interface ActivityLog {
+  id: string;
+  userId: string;
+  userName: string;
+  clientId?: string;
+  clientName?: string;
+  activityType: ActivityType;
+  description: string;
+  metadata?: Record<string, any>; // Extra data like email subject, amount, etc.
+  createdAt: string;
+}
+
+export interface DashboardActivitySummary {
+  recentActivities: ActivityLog[];
+  totalActivitiesToday: number;
+  mostActiveClient: string;
+  activityBreakdown: {
+    type: ActivityType;
+    count: number;
+  }[];
 }
