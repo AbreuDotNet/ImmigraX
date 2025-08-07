@@ -53,6 +53,9 @@
 - **Axios HTTP client** with request/response interceptors
 - **Executive dashboard** with real-time metrics and charts
 - **CRUD operations** for clients, appointments, and documents
+- **Advanced Calendar System** with React Big Calendar integration
+- **Priority-based visual scheduling** with color-coded events
+- **Responsive appointment management** with multi-view support
 - **Integrated authentication** with persistent sessions
 - **Fully responsive design** optimized for all screen sizes
 - **Offline-ready** with mock data fallback capabilities
@@ -79,9 +82,11 @@
 - **React 19.1.1** - Modern UI library
 - **TypeScript** - Type-safe JavaScript
 - **Material-UI v5** - React component library
+- **React Big Calendar** - Advanced calendar scheduling
 - **React Router v6** - Declarative routing
 - **TanStack React Query** - Data fetching/caching
 - **Axios** - HTTP client library
+- **Date-fns** - Modern date utility library
 - **Vite** - Next-generation build tool
 
 </td>
@@ -120,6 +125,8 @@ ImmigraX/
 │   ├── 📁 src/
 │   │   ├── 📁 components/              # Reusable UI Components
 │   │   │   ├── Layout.tsx              # Main application layout
+│   │   │   ├── CalendarView.tsx        # Advanced calendar component
+│   │   │   ├── AppointmentForm.tsx     # Appointment creation/editing
 │   │   │   ├── Dashboard/              # Dashboard components
 │   │   │   └── Common/                 # Shared components
 │   │   ├── 📁 pages/                   # Application Pages
@@ -268,12 +275,16 @@ The system comes with pre-configured demo accounts for testing:
 <td width="33%" valign="top">
 
 ### 📅 **Appointment Scheduling**
-- Integrated calendar management
-- Appointment status workflows
-- Automated reminder notifications
-- Client self-scheduling portal
-- Calendar synchronization
-- Conflict resolution system
+- **📊 Advanced Calendar Views**: Month, Week, Day, and Agenda layouts
+- **🎨 Priority-Based Color Coding**: Visual priority system with color indicators
+- **🔴 High Priority Indicators**: Red dot markers for urgent appointments
+- **👥 Client-Focused Display**: Client names prominently displayed above titles
+- **⏰ Smart Time Management**: Integrated time slots with conflict resolution
+- **📱 Responsive Design**: Optimized font sizes for all screen sizes
+- **🖱️ Interactive Interface**: Click-to-edit appointments with hover effects
+- **🔄 Real-time Updates**: Live appointment status and priority changes
+- **📧 Automated Notifications**: Email reminders and status updates
+- **🔍 Advanced Filtering**: Search and filter by client, priority, or status
 
 </td>
 <td width="33%" valign="top">
@@ -406,6 +417,24 @@ Need custom implementation or enterprise support? Contact us for:
 - Technical support and maintenance
 
 ## 🗺️ Roadmap
+
+### ✅ **Recently Completed - Calendar Enhancement Update (v1.2)**
+- **🎨 Enhanced Calendar Visualization**: 
+  - Improved visual hierarchy with client names prominently displayed
+  - Optimized font sizes (0.6rem base) for better readability across all views
+  - Red priority indicators (🔴) for high-priority appointments
+- **📊 Multi-View Optimization**:
+  - **Week View**: Detailed information display with larger event containers (60px min-height)
+  - **Month View**: Compact yet readable design with improved font scaling
+  - **Day View**: Enhanced time slot visibility with priority indicators
+- **⚡ Performance Improvements**:
+  - Better event rendering with proper z-index layering
+  - Smooth hover animations and transitions
+  - Optimized spacing and padding for mobile devices
+- **🔧 Technical Enhancements**:
+  - Improved TypeScript type safety for appointment data
+  - Better error handling for undefined client IDs
+  - Enhanced priority conversion between numeric and string formats
 
 ### 🎯 **Current Quarter**
 - [ ] **Mobile Application** - React Native app for iOS/Android
