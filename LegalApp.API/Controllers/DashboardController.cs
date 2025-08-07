@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using LegalApp.API.Data;
 using LegalApp.API.Models;
+using LegalApp.API.Services;
 using System.Security.Claims;
 
 namespace LegalApp.API.Controllers
@@ -13,10 +14,12 @@ namespace LegalApp.API.Controllers
     public class DashboardController : ControllerBase
     {
         private readonly LegalAppDbContext _context;
+        private readonly ActivityLogService _activityLogService;
 
-        public DashboardController(LegalAppDbContext context)
+        public DashboardController(LegalAppDbContext context, ActivityLogService activityLogService)
         {
             _context = context;
+            _activityLogService = activityLogService;
         }
 
         [HttpGet("summary")]
@@ -323,6 +326,116 @@ namespace LegalApp.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Error al obtener alertas", error = ex.Message });
+            }
+        }
+
+        [HttpGet("lawfirm")]
+        public async Task<ActionResult> GetCurrentUserLawFirm()
+        {
+            try
+            {
+                var currentUserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(currentUserIdString, out var currentUserId))
+                {
+                    return Unauthorized(new { message = "Token de usuario inválido" });
+                }
+
+                var userLawFirm = await _context.UserLawFirms
+                    .Include(ulf => ulf.LawFirm)
+                    .Where(ulf => ulf.UserId == currentUserId)
+                    .FirstOrDefaultAsync();
+
+                if (userLawFirm == null)
+                {
+                    return NotFound(new { message = "Usuario no tiene firma legal asignada" });
+                }
+
+                return Ok(new 
+                { 
+                    id = userLawFirm.LawFirm.Id,
+                    name = userLawFirm.LawFirm.Name,
+                    address = userLawFirm.LawFirm.Address,
+                    phone = userLawFirm.LawFirm.Phone
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener firma legal", error = ex.Message });
+            }
+        }
+
+        [HttpGet("activities")]
+        public async Task<ActionResult> GetRecentActivities([FromQuery] int limit = 10, [FromQuery] Guid? clientId = null)
+        {
+            try
+            {
+                var currentUserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(currentUserIdString, out var currentUserId))
+                {
+                    return Unauthorized(new { message = "Token de usuario inválido" });
+                }
+
+                var userLawFirm = await _context.UserLawFirms
+                    .Include(ulf => ulf.LawFirm)
+                    .Where(ulf => ulf.UserId == currentUserId)
+                    .FirstOrDefaultAsync();
+
+                if (userLawFirm == null)
+                {
+                    return NotFound(new { message = "Usuario no tiene firma legal asignada" });
+                }
+
+                var activities = await _activityLogService.GetRecentActivitiesAsync(
+                    userLawFirm.LawFirm.Id, limit, clientId);
+
+                var activityDtos = activities.Select(a => new
+                {
+                    id = a.Id,
+                    userId = a.UserId,
+                    userName = a.User.FullName,
+                    clientId = a.ClientId,
+                    clientName = a.Client?.FullName,
+                    activityType = a.ActivityType.ToString(),
+                    description = a.Description,
+                    metadata = a.Metadata,
+                    createdAt = a.CreatedAt
+                }).ToList();
+
+                return Ok(activityDtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener actividades", error = ex.Message });
+            }
+        }
+
+        [HttpGet("activities/stats")]
+        public async Task<ActionResult> GetActivityStats()
+        {
+            try
+            {
+                var currentUserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(currentUserIdString, out var currentUserId))
+                {
+                    return Unauthorized(new { message = "Token de usuario inválido" });
+                }
+
+                var userLawFirm = await _context.UserLawFirms
+                    .Include(ulf => ulf.LawFirm)
+                    .Where(ulf => ulf.UserId == currentUserId)
+                    .FirstOrDefaultAsync();
+
+                if (userLawFirm == null)
+                {
+                    return NotFound(new { message = "Usuario no tiene firma legal asignada" });
+                }
+
+                var stats = await _activityLogService.GetActivityStatsAsync(userLawFirm.LawFirm.Id);
+                return Ok(stats);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener estadísticas de actividades", error = ex.Message });
             }
         }
     }

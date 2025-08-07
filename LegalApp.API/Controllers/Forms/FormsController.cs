@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using LegalApp.API.Data;
 using LegalApp.API.Models.Forms;
 using LegalApp.API.DTOs.Forms;
+using LegalApp.API.Services;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -16,12 +17,14 @@ namespace LegalApp.API.Controllers.Forms
         private readonly LegalAppDbContext _context;
         private readonly ILogger<FormsController> _logger;
         private readonly IWebHostEnvironment _environment;
+        private readonly ActivityLogService _activityLogService;
 
-        public FormsController(LegalAppDbContext context, ILogger<FormsController> logger, IWebHostEnvironment environment)
+        public FormsController(LegalAppDbContext context, ILogger<FormsController> logger, IWebHostEnvironment environment, ActivityLogService activityLogService)
         {
             _context = context;
             _logger = logger;
             _environment = environment;
+            _activityLogService = activityLogService;
         }
 
         // ====================================
@@ -262,6 +265,19 @@ namespace LegalApp.API.Controllers.Forms
 
                 // Registrar en el log de auditoría
                 await LogFormAction(clientForm.Id, null, FormAuditAction.Created, null, null, null);
+
+                // Log activity
+                var currentUserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (Guid.TryParse(currentUserIdString, out var currentUserId))
+                {
+                    await _activityLogService.LogFormSentAsync(
+                        currentUserId,
+                        lawFirmId.Value,
+                        dto.ClientId,
+                        client.FullName,
+                        dto.FormTitle
+                    );
+                }
 
                 // Enviar email al cliente si se solicita
                 if (dto.SendEmail)

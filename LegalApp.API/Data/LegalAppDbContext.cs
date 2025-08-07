@@ -24,6 +24,7 @@ namespace LegalApp.API.Data
         public DbSet<ClientNote> ClientNotes { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
 
         // Form System DbSets
         public DbSet<FormTemplate> FormTemplates { get; set; }
@@ -54,6 +55,7 @@ namespace LegalApp.API.Data
             modelBuilder.Entity<ClientNote>().ToTable("client_notes");
             modelBuilder.Entity<Message>().ToTable("messages");
             modelBuilder.Entity<AuditLog>().ToTable("audit_logs");
+            modelBuilder.Entity<ActivityLog>().ToTable("activity_logs");
 
             // Form System table names
             modelBuilder.Entity<FormTemplate>().ToTable("form_templates");
