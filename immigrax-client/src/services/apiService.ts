@@ -319,7 +319,7 @@ class ApiService {
     return response.data;
   }
 
-  async getActivityLog(clientId?: string, limit: number = 10): Promise<any[]> {
+  async getActivityLog(clientId?: string, limit: number = 5): Promise<any[]> {
     const params = new URLSearchParams();
     if (clientId) params.append('clientId', clientId);
     params.append('limit', limit.toString());
@@ -334,6 +334,5 @@ class ApiService {
   }
 }
 
-// Create and export a singleton instance
 const apiService = new ApiService();
 export default apiService;

@@ -71,12 +71,21 @@ export interface Appointment {
   title?: string;
   description?: string;
   appointmentType?: string;
-  priority?: Priority;
+  priority?: Priority | number; // Can be enum or numeric
   status: AppointmentStatus;
   appointmentDate: string;
   createdBy: string;
   createdAt: string;
   client?: Client;
+  clientName?: string; // For display purposes
+  duration?: number; // Duration in minutes
+}
+
+// Extended type for calendar and list view
+export interface AppointmentWithClient extends Appointment {
+  clientName: string;
+  start?: Date;
+  end?: Date;
 }
 
 export enum Priority {

@@ -181,28 +181,6 @@ const Dashboard: React.FC = () => {
         borderRadius: 2,
         color: 'white'
       }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mr: 3 }}>
-          <img 
-            src="/immigrax-logo.png" 
-            alt="ImmigraX" 
-            style={{ 
-              height: '80px',
-              marginRight: '20px',
-              objectFit: 'contain',
-              filter: 'brightness(0) invert(1)' // Hace el logo blanco
-            }} 
-          />
-          <Typography 
-            variant="h3" 
-            sx={{ 
-              fontWeight: 'bold',
-              color: 'white',
-              letterSpacing: '-1px'
-            }}
-          >
-            SynerVisa
-          </Typography>
-        </Box>
         <Box>
           <Typography variant="h4" gutterBottom sx={{ mb: 1, color: 'white' }}>
             Dashboard Ejecutivo

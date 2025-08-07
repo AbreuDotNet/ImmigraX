@@ -146,7 +146,7 @@ const Layout: React.FC = () => {
       
       <List sx={{ px: 1 }}>
         {menuItems.map((item) => {
-          // Verificar si el usuario tiene permisos para ver este elemento del menú
+
           if (item.roles && !item.roles.includes(user?.role || '')) {
             return null;
           }
@@ -287,29 +287,7 @@ const Layout: React.FC = () => {
             borderRadius: 1,
             p: 0.5
           }}
-          onClick={() => handleNavigation('/dashboard')}
-          >
-            <img 
-              src="/immigrax-logo.png" 
-              alt="ImmigraX" 
-              style={{ 
-                height: '40px',
-                marginRight: '12px',
-                objectFit: 'contain',
-                filter: 'brightness(0) invert(1)' // Para hacer el logo blanco en la barra azul
-              }} 
-            />
-            <Typography 
-              variant="h6" 
-              noWrap 
-              component="div" 
-              sx={{ 
-                fontWeight: 'bold',
-                color: 'white'
-              }}
-            >
-              SynerVisa
-            </Typography>
+          onClick={() => handleNavigation('/dashboard')}>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Chip

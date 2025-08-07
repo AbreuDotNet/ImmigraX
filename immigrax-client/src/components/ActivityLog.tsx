@@ -36,10 +36,10 @@ import apiService from '../services/apiService';
 
 interface ActivityLogProps {
   maxItems?: number;
-  clientId?: string; // If provided, show activities for specific client only
+  clientId?: string;
 }
 
-const ActivityLog: React.FC<ActivityLogProps> = ({ maxItems = 10, clientId }) => {
+const ActivityLog: React.FC<ActivityLogProps> = ({ maxItems = 5, clientId }) => {
   const [activities, setActivities] = useState<ActivityLogType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
