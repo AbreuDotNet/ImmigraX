@@ -101,15 +101,30 @@ const Layout: React.FC = () => {
           }}
           onClick={() => handleNavigation('/dashboard')}
         >
-          <img 
-            src="/immigrax-logo.png" 
-            alt="ImmigraX" 
-            style={{ 
-              height: '50px',
-              maxWidth: '100%',
-              objectFit: 'contain'
-            }} 
-          />
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <img 
+              src="/immigrax-logo.png" 
+              alt="ImmigraX" 
+              style={{ 
+                height: '50px',
+                marginRight: '12px',
+                objectFit: 'contain'
+              }} 
+            />
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                fontWeight: 'bold',
+                background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                letterSpacing: '-0.5px'
+              }}
+            >
+              SynerVisa
+            </Typography>
+          </Box>
         </Box>
       </Toolbar>
       
@@ -243,10 +258,23 @@ const Layout: React.FC = () => {
               alt="ImmigraX" 
               style={{ 
                 height: '32px',
+                marginRight: '8px',
                 objectFit: 'contain',
                 filter: 'brightness(0) invert(1)'
               }} 
             />
+            <Typography 
+              variant="h6" 
+              noWrap 
+              component="div" 
+              sx={{ 
+                fontWeight: 'bold',
+                fontSize: '16px',
+                color: 'white'
+              }}
+            >
+              SynerVisa
+            </Typography>
           </Box>
           <Box sx={{ 
             flexGrow: 1, 
@@ -266,10 +294,22 @@ const Layout: React.FC = () => {
               alt="ImmigraX" 
               style={{ 
                 height: '40px',
+                marginRight: '12px',
                 objectFit: 'contain',
                 filter: 'brightness(0) invert(1)' // Para hacer el logo blanco en la barra azul
               }} 
             />
+            <Typography 
+              variant="h6" 
+              noWrap 
+              component="div" 
+              sx={{ 
+                fontWeight: 'bold',
+                color: 'white'
+              }}
+            >
+              SynerVisa
+            </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Chip

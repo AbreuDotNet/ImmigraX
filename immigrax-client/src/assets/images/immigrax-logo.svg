@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="120" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Globe/World con fondo transparente y colores exactos -->
+  <circle cx="45" cy="60" r="30" fill="#7BB3E8"/>
+  <circle cx="45" cy="60" r="28" fill="none" stroke="#1B365D" stroke-width="1"/>
+  
+  <!-- Continentes del globo más precisos -->
+  <path d="M22 50 Q28 40, 35 45 Q42 42, 48 46 Q52 42, 58 46 Q65 44, 68 50 Q70 56, 66 62 Q62 68, 55 70 Q48 72, 42 68 Q35 70, 28 66 Q22 62, 20 56 Q20 52, 22 50 Z" 
+        fill="#1B365D" opacity="0.8"/>
+        
+  <!-- Líneas de latitud del globo -->
+  <path d="M20 45 Q32 42, 45 45 Q58 42, 70 45" stroke="#1B365D" stroke-width="0.8" fill="none" opacity="0.6"/>
+  <path d="M20 75 Q32 78, 45 75 Q58 78, 70 75" stroke="#1B365D" stroke-width="0.8" fill="none" opacity="0.6"/>
+
+  <!-- X estilizada exacta al diseño -->
+  <g transform="translate(85, 20)">
+    <!-- Círculo superior izquierdo -->
+    <circle cx="8" cy="8" r="8" fill="#7BB3E8"/>
+    
+    <!-- Brazo diagonal superior -->
+    <path d="M8 16 Q12 20, 16 24 L40 48 Q44 52, 48 48 L52 44 Q56 40, 52 36 L28 12 Q24 8, 20 12 Q16 8, 12 12 L8 16 Z" 
+          fill="#7BB3E8"/>
+    
+    <!-- Círculo inferior derecho -->
+    <circle cx="56" cy="72" r="8" fill="#7BB3E8"/>
+    
+    <!-- Brazo diagonal inferior -->
+    <path d="M48 64 Q44 60, 40 56 L16 32 Q12 28, 8 32 L4 36 Q0 40, 4 44 L28 68 Q32 72, 36 68 L48 64 Z" 
+          fill="#7BB3E8"/>
+    
+    <!-- Círculo superior derecho -->
+    <circle cx="56" cy="8" r="8" fill="#1B365D"/>
+    
+    <!-- Brazo diagonal superior derecho -->
+    <path d="M56 16 Q52 20, 48 24 L24 48 Q20 52, 24 56 L28 60 Q32 64, 36 60 L60 36 Q64 32, 60 28 L56 16 Z" 
+          fill="#1B365D"/>
+    
+    <!-- Círculo inferior izquierdo -->
+    <circle cx="8" cy="72" r="8" fill="#1B365D"/>
+    
+    <!-- Brazo diagonal inferior izquierdo -->
+    <path d="M16 64 Q20 60, 24 56 L48 32 Q52 28, 48 24 L44 20 Q40 16, 36 20 L12 44 Q8 48, 12 52 L16 64 Z" 
+          fill="#1B365D"/>
+    
+    <!-- Centro de conexión -->
+    <circle cx="32" cy="40" r="6" fill="#1B365D"/>
+    <circle cx="32" cy="40" r="3" fill="#7BB3E8"/>
+  </g>
+  
+  <!-- Texto "ImmigraX" con colores exactos -->
+  <text x="170" y="50" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="42" 
+        font-weight="800" 
+        fill="#1B365D"
+        letter-spacing="-2px">
+    Immigra
+  </text>
+  <text x="340" y="50" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="42" 
+        font-weight="800" 
+        fill="#7BB3E8"
+        letter-spacing="-2px">
+    X
+  </text>
+</svg>

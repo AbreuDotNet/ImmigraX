@@ -59,15 +59,30 @@ const Login: React.FC = () => {
         <Card sx={{ width: '100%', maxWidth: 400 }}>
           <CardContent sx={{ p: 4 }}>
             <Box sx={{ textAlign: 'center', mb: 3 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
                 <img 
                   src="/immigrax-logo.png" 
                   alt="ImmigraX" 
                   style={{ 
                     height: '80px',
+                    marginRight: '16px',
                     objectFit: 'contain'
                   }} 
                 />
+                <Typography 
+                  variant="h3" 
+                  component="h1" 
+                  sx={{ 
+                    fontWeight: 'bold',
+                    background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    letterSpacing: '-1px'
+                  }}
+                >
+                  SynerVisa
+                </Typography>
               </Box>
               <Typography variant="h6" color="text.secondary">
                 Sistema de Gestión Legal
