@@ -16,6 +16,13 @@ namespace LegalApp.API.Data
         public DbSet<UserLawFirm> UserLawFirms { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<ClientDocument> ClientDocuments { get; set; }
+        
+        // Document Management System DbSets
+        public DbSet<DocumentCategory> DocumentCategories { get; set; }
+        public DbSet<DocumentTag> DocumentTags { get; set; }
+        public DbSet<DocumentTagAssignment> DocumentTagAssignments { get; set; }
+        public DbSet<DocumentUserPermission> DocumentUserPermissions { get; set; }
+        
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<AppointmentConfirmation> AppointmentConfirmations { get; set; }
         public DbSet<Payment> Payments { get; set; }
@@ -67,6 +74,12 @@ namespace LegalApp.API.Data
             modelBuilder.Entity<ClientFormDocument>().ToTable("client_form_documents");
             modelBuilder.Entity<FormNotification>().ToTable("form_notifications");
             modelBuilder.Entity<FormAuditLog>().ToTable("form_audit_log");
+
+            // Document Management System table names
+            modelBuilder.Entity<DocumentCategory>().ToTable("document_categories");
+            modelBuilder.Entity<DocumentTag>().ToTable("document_tags");
+            modelBuilder.Entity<DocumentTagAssignment>().ToTable("document_tag_assignments");
+            modelBuilder.Entity<DocumentUserPermission>().ToTable("document_user_permissions");
 
             // Configure composite primary key for UserLawFirm
             modelBuilder.Entity<UserLawFirm>()
@@ -153,6 +166,58 @@ namespace LegalApp.API.Data
                 .WithOne(cn => cn.Client)
                 .HasForeignKey(cn => cn.ClientId);
 
+            // Document Management System relationships
+            
+            // ClientDocument relationships
+            modelBuilder.Entity<ClientDocument>()
+                .HasOne(cd => cd.Category)
+                .WithMany(dc => dc.Documents)
+                .HasForeignKey(cd => cd.CategoryId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<ClientDocument>()
+                .HasMany(cd => cd.TagAssignments)
+                .WithOne(dta => dta.Document)
+                .HasForeignKey(dta => dta.DocumentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClientDocument>()
+                .HasMany(cd => cd.UserPermissions)
+                .WithOne(dup => dup.Document)
+                .HasForeignKey(dup => dup.DocumentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // DocumentCategory relationships - self-referencing hierarchy
+            modelBuilder.Entity<DocumentCategory>()
+                .HasOne(dc => dc.ParentCategory)
+                .WithMany(dc => dc.SubCategories)
+                .HasForeignKey(dc => dc.ParentCategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // DocumentTag relationships
+            modelBuilder.Entity<DocumentTag>()
+                .HasMany(dt => dt.DocumentTagAssignments)
+                .WithOne(dta => dta.Tag)
+                .HasForeignKey(dta => dta.TagId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // DocumentTagAssignment composite key
+            modelBuilder.Entity<DocumentTagAssignment>()
+                .HasKey(dta => new { dta.DocumentId, dta.TagId });
+
+            // DocumentUserPermission relationships
+            modelBuilder.Entity<DocumentUserPermission>()
+                .HasOne(dup => dup.User)
+                .WithMany()
+                .HasForeignKey(dup => dup.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DocumentUserPermission>()
+                .HasOne(dup => dup.GrantedByUser)
+                .WithMany()
+                .HasForeignKey(dup => dup.GrantedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // PaymentPlan relationships
             modelBuilder.Entity<PaymentPlan>()
                 .HasMany(pp => pp.Installments)
@@ -172,6 +237,10 @@ namespace LegalApp.API.Data
 
             modelBuilder.Entity<Appointment>()
                 .Property(a => a.Priority)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<ClientDocument>()
+                .Property(cd => cd.AccessLevel)
                 .HasConversion<string>();
 
             // Configure column mappings to match PostgreSQL naming

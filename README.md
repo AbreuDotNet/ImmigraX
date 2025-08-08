@@ -452,6 +452,50 @@ Need custom implementation or enterprise support? Contact us for:
 
 ---
 
+## 🔄 Recent Updates & Improvements
+
+### ✅ Calendar Enhancement (Latest)
+- **🎯 Client-First Display**: Client names now prominently displayed above appointment titles
+- **📏 Optimized Font Sizes**: Reduced to 0.6rem for better space utilization in weekly view
+- **🔴 Priority Indicators**: Visual red indicators for high-priority appointments
+- **📱 Responsive Design**: Automatic font adjustments based on screen size
+- **🎨 Visual Hierarchy**: Bold client names with subtle title styling
+
+### 🗄️ Document Management System (Enhanced)
+
+#### 📚 Hierarchical Categories
+- **Nested Organization**: Parent-child category relationships for advanced organization
+- **Visual Customization**: Material-UI colors and icons for each category
+- **Smart Sorting**: Configurable order and activation controls
+- **Complete API**: Full CRUD operations for category management
+
+#### 🏷️ Flexible Tagging System  
+- **Custom Tags**: User-created tags with customizable colors
+- **System Tags**: Predefined tags for specific functionalities
+- **Usage Analytics**: Automatic tracking of tag usage frequency
+- **Multiple Assignment**: Documents can have multiple tags
+
+#### 🔐 Granular Access Control
+- **Access Levels**: Public, Restricted, Confidential, HighlyConfidential
+- **Specific Permissions**: Individual control over view, edit, delete, and share
+- **Expiration Management**: Time-limited permissions with automatic expiry
+- **Complete Audit Trail**: Full logging of permission grants and changes
+
+#### 📊 Enhanced Document Model
+- **Rich Metadata**: MIME type, file size, SHA-256 hash for integrity
+- **Version Control**: Improved versioning with detailed notes
+- **Soft Archiving**: Archive documents with audit information
+- **Full-Text Search**: Indexed content for fast document searches
+
+### 🛠️ Technical Implementation
+- **Database**: New migration `EnhanceDocumentManagementSystem` applied
+- **Models**: 4 new entities (DocumentCategory, DocumentTag, DocumentTagAssignment, DocumentUserPermission)  
+- **DTOs**: Comprehensive data transfer objects for all new features
+- **Relationships**: Complex many-to-many and hierarchical relationships configured
+- **Type Safety**: Full TypeScript integration for frontend
+
+---
+
 <div align="center">
   
 ### 🌟 **Star this repository if you find it helpful!** ⭐
