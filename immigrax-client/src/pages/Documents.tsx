@@ -24,7 +24,6 @@ import {
   ListItemIcon,
   ListItemText,
   ListItemSecondaryAction,
-  Badge,
   Divider,
 } from '@mui/material';
 import {
@@ -41,6 +40,10 @@ import {
   Person as PersonIcon,
 } from '@mui/icons-material';
 import apiService from '../services/apiService';
+import DocumentManagementMenu from '../components/documents/DocumentManagementMenu';
+import DocumentAccessLevelChip from '../components/documents/DocumentAccessLevelChip';
+import DocumentTagsDisplay from '../components/documents/DocumentTagsDisplay';
+import { DocumentAccessLevel } from '../types';
 
 interface Document {
   id: string;
@@ -53,6 +56,10 @@ interface Document {
   documentType: string;
   uploadedAt: string;
   description?: string;
+  // Nuevos campos para el sistema de permisos
+  accessLevel?: DocumentAccessLevel;
+  categoryId?: number;
+  tags?: Array<{id: number, name: string, color: string}>;
 }
 
 const documentTypes = [
@@ -103,7 +110,13 @@ const Documents: React.FC = () => {
           fileSize: 2048576,
           documentType: 'Pasaporte',
           uploadedAt: '2025-01-15T10:30:00Z',
-          description: 'Pasaporte vigente para solicitud de visa'
+          description: 'Pasaporte vigente para solicitud de visa',
+          accessLevel: DocumentAccessLevel.Confidential,
+          categoryId: 1,
+          tags: [
+            { id: 1, name: 'Urgente', color: '#f44336' },
+            { id: 2, name: 'Inmigración', color: '#2196f3' }
+          ]
         },
         {
           id: '2',
@@ -115,7 +128,11 @@ const Documents: React.FC = () => {
           fileSize: 1200000,
           documentType: 'Acta de Nacimiento',
           uploadedAt: '2025-01-12T09:00:00Z',
-          description: 'Acta de nacimiento apostillada'
+          description: 'Acta de nacimiento apostillada',
+          accessLevel: DocumentAccessLevel.Restricted,
+          tags: [
+            { id: 3, name: 'Apostillado', color: '#4caf50' }
+          ]
         },
         {
           id: '3',
@@ -126,7 +143,11 @@ const Documents: React.FC = () => {
           fileType: 'image/jpeg',
           fileSize: 850000,
           documentType: 'Certificado Médico',
-          uploadedAt: '2025-01-10T14:20:00Z'
+          uploadedAt: '2025-01-10T14:20:00Z',
+          accessLevel: DocumentAccessLevel.Public,
+          tags: [
+            { id: 4, name: 'Médico', color: '#ff9800' }
+          ]
         },
         {
           id: '4',
@@ -138,7 +159,12 @@ const Documents: React.FC = () => {
           fileSize: 1800000,
           documentType: 'Pasaporte',
           uploadedAt: '2025-01-14T11:15:00Z',
-          description: 'Pasaporte renovado recientemente'
+          description: 'Pasaporte renovado recientemente',
+          accessLevel: DocumentAccessLevel.HighlyConfidential,
+          tags: [
+            { id: 2, name: 'Inmigración', color: '#2196f3' },
+            { id: 5, name: 'VIP', color: '#9c27b0' }
+          ]
         },
         {
           id: '5',
@@ -149,7 +175,12 @@ const Documents: React.FC = () => {
           fileType: 'image/jpeg',
           fileSize: 950000,
           documentType: 'Visa',
-          uploadedAt: '2025-01-13T16:45:00Z'
+          uploadedAt: '2025-01-13T16:45:00Z',
+          accessLevel: DocumentAccessLevel.Restricted,
+          tags: [
+            { id: 2, name: 'Inmigración', color: '#2196f3' },
+            { id: 6, name: 'Vigente', color: '#4caf50' }
+          ]
         },
         {
           id: '6',
@@ -161,7 +192,12 @@ const Documents: React.FC = () => {
           fileSize: 1500000,
           documentType: 'Diploma',
           uploadedAt: '2025-01-08T09:15:00Z',
-          description: 'Título universitario apostillado'
+          description: 'Título universitario apostillado',
+          accessLevel: DocumentAccessLevel.Public,
+          tags: [
+            { id: 3, name: 'Apostillado', color: '#4caf50' },
+            { id: 7, name: 'Educación', color: '#607d8b' }
+          ]
         },
         {
           id: '7',
@@ -172,7 +208,12 @@ const Documents: React.FC = () => {
           fileType: 'application/pdf',
           fileSize: 1100000,
           documentType: 'Acta de Matrimonio',
-          uploadedAt: '2025-01-05T13:30:00Z'
+          uploadedAt: '2025-01-05T13:30:00Z',
+          accessLevel: DocumentAccessLevel.Confidential,
+          tags: [
+            { id: 3, name: 'Apostillado', color: '#4caf50' },
+            { id: 8, name: 'Familiar', color: '#e91e63' }
+          ]
         }
       ];
       
@@ -323,30 +364,33 @@ const Documents: React.FC = () => {
             Administra todos los documentos de tus clientes de forma organizada
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setOpenDialog(true)}
-          size="large"
-          sx={{
-            borderRadius: 3,
-            px: 3,
-            py: 1.5,
-            textTransform: 'none',
-            fontSize: '1rem',
-            fontWeight: 600,
-            boxShadow: 3,
-            background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-            '&:hover': {
-              boxShadow: 6,
-              transform: 'translateY(-2px)',
-              background: 'linear-gradient(45deg, #1976D2 30%, #1CB5E0 90%)',
-            },
-            transition: 'all 0.3s ease'
-          }}
-        >
-          📤 Subir Documento
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <DocumentManagementMenu />
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setOpenDialog(true)}
+            size="large"
+            sx={{
+              borderRadius: 3,
+              px: 3,
+              py: 1.5,
+              textTransform: 'none',
+              fontSize: '1rem',
+              fontWeight: 600,
+              boxShadow: 3,
+              background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+              '&:hover': {
+                boxShadow: 6,
+                transform: 'translateY(-2px)',
+                background: 'linear-gradient(45deg, #1976D2 30%, #1CB5E0 90%)',
+              },
+              transition: 'all 0.3s ease'
+            }}
+          >
+            📤 Subir Documento
+          </Button>
+        </Box>
       </Box>
 
       {error && (
@@ -548,28 +592,67 @@ const Documents: React.FC = () => {
                           <Box sx={{ 
                             display: 'flex', 
                             flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: 1
+                            alignItems: 'flex-end',
+                            gap: 1.5,
+                            minWidth: 200
                           }}>
-                            {/* Chip del tipo de documento centrado */}
-                            <Chip 
-                              label={document.documentType}
-                              color={getDocumentTypeColor(document.documentType)}
-                              size="small"
-                              variant="outlined"
-                              sx={{ 
-                                fontWeight: 600,
-                                fontSize: '0.75rem',
-                                height: 24,
-                                mb: 0.5
-                              }}
-                            />
+                            {/* Primera fila: Tipo de documento y nivel de acceso */}
+                            <Box sx={{ 
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1,
+                              flexWrap: 'wrap',
+                              justifyContent: 'flex-end'
+                            }}>
+                              {/* Chip del tipo de documento */}
+                              <Chip 
+                                label={document.documentType}
+                                color={getDocumentTypeColor(document.documentType)}
+                                size="small"
+                                variant="outlined"
+                                sx={{ 
+                                  fontWeight: 600,
+                                  fontSize: '0.75rem',
+                                  height: 24
+                                }}
+                              />
+
+                              {/* Chip de nivel de acceso */}
+                              {document.accessLevel !== undefined && (
+                                <DocumentAccessLevelChip 
+                                  accessLevel={document.accessLevel}
+                                  size="small"
+                                />
+                              )}
+                            </Box>
+
+                            {/* Segunda fila: Etiquetas */}
+                            {document.tags && document.tags.length > 0 && (
+                              <Box sx={{ 
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                                width: '100%'
+                              }}>
+                                <DocumentTagsDisplay 
+                                  documentId={document.id}
+                                  tags={document.tags.map(tag => ({
+                                    id: tag.id.toString(),
+                                    name: tag.name,
+                                    color: tag.color
+                                  }))}
+                                  maxVisible={3}
+                                  size="small"
+                                  canEdit={false}
+                                />
+                              </Box>
+                            )}
                             
-                            {/* Botones de acción */}
+                            {/* Tercera fila: Botones de acción */}
                             <Box sx={{ 
                               display: 'flex', 
                               gap: 0.5,
-                              alignItems: 'center'
+                              alignItems: 'center',
+                              mt: 0.5
                             }}>
                               <IconButton 
                                 size="small" 

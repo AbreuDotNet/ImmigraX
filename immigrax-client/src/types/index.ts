@@ -368,3 +368,154 @@ export interface DashboardActivitySummary {
     count: number;
   }[];
 }
+
+// Document Management Types
+export enum DocumentAccessLevel {
+  Public = 'Public',
+  Restricted = 'Restricted',
+  Confidential = 'Confidential',
+  HighlyConfidential = 'HighlyConfidential'
+}
+
+export interface DocumentCategory {
+  id: string;
+  name: string;
+  description?: string;
+  color: string;
+  icon?: string;
+  sortOrder: number;
+  isActive: boolean;
+  parentCategoryId?: string;
+  parentCategoryName?: string;
+  subCategories: DocumentCategory[];
+  documentCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DocumentCategorySimple {
+  id: string;
+  name: string;
+  color: string;
+  icon?: string;
+  parentCategoryId?: string;
+  parentPath?: string;
+}
+
+export interface DocumentTag {
+  id: string;
+  name: string;
+  color: string;
+  isSystemTag: boolean;
+  usageCount: number;
+  createdAt: string;
+}
+
+export interface DocumentTagSimple {
+  id: string;
+  name: string;
+  color: string;
+}
+
+export interface DocumentUserPermission {
+  id: string;
+  documentId: string;
+  documentName: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  canView: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  canShare: boolean;
+  grantedBy: string;
+  grantedByUserName: string;
+  grantedAt: string;
+  expiresAt?: string;
+  isActive: boolean;
+  isExpired: boolean;
+}
+
+export interface DocumentPermissionCheck {
+  documentId: string;
+  userId: string;
+  documentAccessLevel: DocumentAccessLevel;
+  canView: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  canShare: boolean;
+  hasSpecificPermissions: boolean;
+  isOwner: boolean;
+  accessReason: string;
+}
+
+export interface DocumentResponse {
+  id: string;
+  documentType: string;
+  fileName: string;
+  fileUrl: string;
+  categoryId?: string;
+  categoryName?: string;
+  categoryColor?: string;
+  accessLevel: DocumentAccessLevel;
+  mimeType?: string;
+  fileSizeBytes?: number;
+  fileHash?: string;
+  version: number;
+  versionNotes?: string;
+  description?: string;
+  notes?: string;
+  uploadedAt: string;
+  modifiedAt?: string;
+  isCurrent: boolean;
+  isArchived: boolean;
+  archivedAt?: string;
+  clientName: string;
+  uploadedByName: string;
+  archivedByName?: string;
+  tags: DocumentTagSimple[];
+  canView: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  canShare: boolean;
+}
+
+// DTOs for creating/updating
+export interface CreateDocumentCategoryDto {
+  name: string;
+  description?: string;
+  color?: string;
+  icon?: string;
+  sortOrder?: number;
+  parentCategoryId?: string;
+}
+
+export interface CreateDocumentTagDto {
+  name: string;
+  color?: string;
+  isSystemTag?: boolean;
+}
+
+export interface CreateDocumentUserPermissionDto {
+  documentId: string;
+  userId: string;
+  canView?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
+  canShare?: boolean;
+  expiresAt?: string;
+}
+
+export interface BulkDocumentPermissionDto {
+  documentId: string;
+  userPermissions: UserPermissionDto[];
+}
+
+export interface UserPermissionDto {
+  userId: string;
+  canView?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
+  canShare?: boolean;
+  expiresAt?: string;
+}
